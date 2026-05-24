@@ -5,6 +5,7 @@ import Twig from 'twig'
 
 const ROOT = process.cwd()
 const PAGES_DIR = path.join(ROOT, 'dev/pages')
+const FULL_RELOAD_DELAY = 150
 
 // Les includes utilisent des chemins depuis la racine ('dev/components/...')
 // settings.views = ROOT indique à twig 3.x d'utiliser ROOT comme base de résolution.
@@ -19,6 +20,8 @@ function renderTwig(filePath, data = {}) {
 }
 
 function openUIPlugin() {
+  let fullReloadTimer
+
   return {
     name: 'openui',
 
@@ -85,7 +88,10 @@ function openUIPlugin() {
     // HMR : rechargement complet sur changement .twig
     handleHotUpdate({ file, server }) {
       if (file.endsWith('.twig')) {
-        server.ws.send({ type: 'full-reload' })
+        clearTimeout(fullReloadTimer)
+        fullReloadTimer = setTimeout(() => {
+          server.ws.send({ type: 'full-reload' })
+        }, FULL_RELOAD_DELAY)
         return []
       }
     }
@@ -95,7 +101,19 @@ function openUIPlugin() {
 export default defineConfig({
   plugins: [openUIPlugin()],
   server: {
-    port: 3000
+    port: 3000,
+    watch: {
+      awaitWriteFinish: {
+        stabilityThreshold: 200,
+        pollInterval: 50
+      },
+      ignored: [
+        '**/.git/**',
+        '**/node_modules/**',
+        '**/public/**',
+        '*.html'
+      ]
+    }
   },
   publicDir: false,
   build: {

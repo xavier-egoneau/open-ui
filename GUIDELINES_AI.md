@@ -1,6 +1,8 @@
 # GUIDELINES_AI.md - Open UI
 
 > Document universel. Toute IA qui lit ce fichier doit pouvoir creer un composant conforme sans autre explication.
+>
+> Les contrats detailles du projet vivent aussi dans `docs/` : modele composant, analyse d'impact, workflow agent, tokens, multi-projets et esquisses.
 
 ---
 

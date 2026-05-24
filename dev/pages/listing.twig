@@ -6,6 +6,8 @@
   variant: previewHeader.variant|default('light'),
   sticky: previewHeader.sticky|default(true),
   logoText: previewHeader.logoText|default('MonSite'),
+  showThemeToggle: previewHeader.showThemeToggle|default(true),
+  themeToggleLabel: previewHeader.themeToggleLabel|default('Mode sombre'),
   cta: {
     variant: previewHeader.ctaVariant|default('auto'),
     size: previewHeader.ctaSize|default('sm'),
@@ -25,7 +27,7 @@
   hasImage: previewArticles.hasImage|default(true),
   hasCta: previewArticles.hasCta|default(true),
   cta: {
-    text: previewArticles.ctaText|default('Lire l\'article')
+    text: previewArticles.ctaText|default('Lire l’article')
   }
 } %}
 
@@ -43,6 +45,8 @@
     variant: header.variant,
     sticky: header.sticky,
     logoText: header.logoText,
+    showThemeToggle: header.showThemeToggle,
+    themeToggleLabel: header.themeToggleLabel,
     cta: header.cta,
     links: [
       { label: 'Accueil',  href: '#' },
@@ -65,10 +69,10 @@
 
       {% set articles = [
         {
-          title: 'Introduction à l\'Atomic Design',
+          title: 'Introduction à l’Atomic Design',
           text: 'Comprendre la méthode Atomic Design pour structurer vos interfaces de façon cohérente et maintenable.',
           tag: 'Méthodo',
-          ctaText: 'Lire l\'article',
+          ctaText: 'Lire l’article',
           imageUrl: 'https://placehold.co/600x400/e0f2fe/0369a1?text=Atomic+Design',
           imageAlt: 'Illustration Atomic Design'
         },
@@ -76,7 +80,7 @@
           title: 'Construire un design system avec SCSS',
           text: 'Mettre en place un design system robuste grâce aux variables et mixins SCSS pour une cohérence visuelle totale.',
           tag: 'SCSS',
-          ctaText: 'Lire l\'article',
+          ctaText: 'Lire l’article',
           imageUrl: 'https://placehold.co/600x400/fce7f3/be185d?text=Design+System',
           imageAlt: 'Illustration Design System'
         },
@@ -84,33 +88,41 @@
           title: 'Accessibilité web : les fondamentaux',
           text: 'Les règles essentielles pour rendre vos interfaces accessibles à tous, avec des exemples concrets et actionnables.',
           tag: 'A11y',
-          ctaText: 'Lire l\'article',
+          ctaText: 'Lire l’article',
           imageUrl: 'https://placehold.co/600x400/dcfce7/15803d?text=Accessibilité',
           imageAlt: 'Illustration accessibilité'
         },
         {
-          title: 'Vite.js en 2025 : ce qu\'il faut savoir',
-          text: 'Tour d\'horizon des fonctionnalités clés de Vite.js et pourquoi c\'est devenu l\'outil de référence pour les projets front.',
+          title: 'Vite.js en 2025 : ce qu’il faut savoir',
+          text: 'Tour d’horizon des fonctionnalités clés de Vite.js et pourquoi c’est devenu l’outil de référence pour les projets front.',
           tag: 'Tooling',
-          ctaText: 'Lire l\'article',
+          ctaText: 'Lire l’article',
           imageUrl: 'https://placehold.co/600x400/fef9c3/a16207?text=Vite.js',
           imageAlt: 'Illustration Vite.js'
         },
         {
           title: 'BEM : la convention CSS qui scale',
-          text: 'Pourquoi BEM reste la meilleure convention de nommage CSS pour les projets d\'équipe, et comment l\'appliquer efficacement.',
+          text: 'Pourquoi BEM reste la meilleure convention de nommage CSS pour les projets d’équipe, et comment l’appliquer efficacement.',
           tag: 'CSS',
-          ctaText: 'Lire l\'article',
+          ctaText: 'Lire l’article',
           imageUrl: 'https://placehold.co/600x400/ede9fe/6d28d9?text=BEM',
           imageAlt: 'Illustration BEM'
         },
         {
           title: 'Twig pour les intégrateurs',
-          text: 'Guide pratique du moteur de template Twig : syntaxe, filtres, includes et bonnes pratiques pour l\'intégration HTML.',
+          text: 'Guide pratique du moteur de template Twig : syntaxe, filtres, includes et bonnes pratiques pour l’intégration HTML.',
           tag: 'Twig',
-          ctaText: 'Lire l\'article',
+          ctaText: 'Lire l’article',
           imageUrl: 'https://placehold.co/600x400/ffedd5/c2410c?text=Twig',
           imageAlt: 'Illustration Twig'
+        },
+        {
+          title: 'Composer des interfaces avec des composants',
+          text: 'Bonnes pratiques pour assembler des composants réutilisables sans casser la cohérence du design system.',
+          tag: 'Composants',
+          ctaText: 'Lire l’article',
+          imageUrl: 'https://placehold.co/600x400/e0e7ff/3730a3?text=Composants',
+          imageAlt: 'Illustration composants UI'
         }
       ] %}
 

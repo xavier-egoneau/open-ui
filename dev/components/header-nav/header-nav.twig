@@ -1,6 +1,8 @@
 {% set variant  = variant|default('light') %}
 {% set sticky   = sticky|default(false) %}
 {% set logoText = logoText|default('MonSite') %}
+{% set showThemeToggle = showThemeToggle|default(true) %}
+{% set themeToggleLabel = themeToggleLabel|default('Mode sombre') %}
 {% set previewCta = __previewParts.cta.params|default(cta|default({})) %}
 {% set cta = {
   variant: previewCta.variant|default('auto'),
@@ -43,22 +45,71 @@
       </ul>
     </nav>
 
-    <div
-      class="header-nav__cta"
-      data-gf-node-type="part"
-      data-gf-node-id="cta"
-      data-gf-child-component="button"
-      data-gf-node-label="CTA"
-      data-gf-exposed="true"
-    >
-      {% include 'dev/components/button/button.twig' with {
-        text: cta.text,
-        variant: resolvedCtaVariant,
-        size: cta.size,
-        full: cta.full,
-        disabled: cta.disabled
-      } %}
+    <div class="header-nav__actions">
+      {% if showThemeToggle %}
+        <button
+          class="header-nav__theme-toggle"
+          type="button"
+          aria-pressed="false"
+          aria-label="Activer le mode sombre"
+          data-theme-toggle
+        >
+          <span class="header-nav__theme-icon" aria-hidden="true">☾</span>
+          <span class="header-nav__theme-label">{{ themeToggleLabel }}</span>
+        </button>
+      {% endif %}
+
+      <div
+        class="header-nav__cta"
+        data-gf-node-type="part"
+        data-gf-node-id="cta"
+        data-gf-child-component="button"
+        data-gf-node-label="CTA"
+        data-gf-exposed="true"
+      >
+        {% include 'dev/components/button/button.twig' with {
+          text: cta.text,
+          variant: resolvedCtaVariant,
+          size: cta.size,
+          full: cta.full,
+          disabled: cta.disabled
+        } %}
+      </div>
     </div>
+
+    {% if showThemeToggle %}
+      <script>
+        (() => {
+          const storageKey = 'open-ui-theme';
+          const root = document.documentElement;
+          const toggle = document.querySelector('[data-theme-toggle]');
+          if (!toggle) return;
+
+          const label = toggle.querySelector('.header-nav__theme-label');
+          const icon = toggle.querySelector('.header-nav__theme-icon');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const savedTheme = localStorage.getItem(storageKey);
+          const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+          const applyTheme = (theme) => {
+            const isDark = theme === 'dark';
+            root.dataset.theme = theme;
+            toggle.setAttribute('aria-pressed', String(isDark));
+            toggle.setAttribute('aria-label', isDark ? 'Activer le mode clair' : 'Activer le mode sombre');
+            if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+            if (icon) icon.textContent = isDark ? '☀' : '☾';
+          };
+
+          applyTheme(initialTheme);
+
+          toggle.addEventListener('click', () => {
+            const nextTheme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem(storageKey, nextTheme);
+            applyTheme(nextTheme);
+          });
+        })();
+      </script>
+    {% endif %}
 
   </div>
 </header>

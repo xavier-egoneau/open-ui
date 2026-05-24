@@ -1,7 +1,7 @@
 {
   "name": "Page formulaire",
   "category": "Pages",
-  "description": "Page de creation de compte avec composants de formulaire, header et footer.",
+  "description": "Page de création de compte avec composants de formulaire, header et footer.",
   "variants": {},
   "content": {},
   "parts": {
@@ -17,11 +17,13 @@
           "ctaVariant": "primary",
           "ctaSize": "md",
           "ctaFull": false,
-          "ctaDisabled": false
+          "ctaDisabled": false,
+          "showThemeToggle": true
         },
         "content": {
           "logoText": "MonSite",
-          "ctaText": "Commencer"
+          "ctaText": "Commencer",
+          "themeToggleLabel": "Mode sombre"
         }
       }
     },
@@ -37,7 +39,7 @@
         "content": {
           "logoText": "MonSite",
           "tagline": "Construisons quelque chose de grand.",
-          "copyright": "© 2025 MonSite. Tous droits reserves."
+          "copyright": "© 2025 MonSite. Tous droits réservés."
         }
       }
     },
@@ -190,7 +192,7 @@
   },
   "instances": {
     "firstName": {
-      "label": "Prenom",
+      "label": "Prénom",
       "component": "input",
       "family": "inputs",
       "mode": "single",
@@ -201,7 +203,7 @@
           "required": true
         },
         "content": {
-          "label": "Prenom",
+          "label": "Prénom",
           "placeholder": "ex : Jean",
           "helpText": ""
         }
@@ -239,12 +241,12 @@
         "content": {
           "label": "Adresse e-mail",
           "placeholder": "ex : jean@exemple.fr",
-          "helpText": "Utilisee pour la connexion et les notifications."
+          "helpText": "Connexion et notifications."
         }
       }
     },
     "phone": {
-      "label": "Telephone",
+      "label": "Téléphone",
       "component": "input",
       "family": "inputs",
       "mode": "single",
@@ -255,8 +257,26 @@
           "required": false
         },
         "content": {
-          "label": "Telephone",
+          "label": "Téléphone",
           "placeholder": "ex : +33 6 12 34 56 78",
+          "helpText": ""
+        }
+      }
+    },
+    "landlinePhone": {
+      "label": "Téléphone fixe",
+      "component": "input",
+      "family": "inputs",
+      "mode": "single",
+      "autoBind": true,
+      "defaults": {
+        "variants": {
+          "type": "tel",
+          "required": false
+        },
+        "content": {
+          "label": "Tél. fixe",
+          "placeholder": "ex : +33 5 12 34 56 78",
           "helpText": ""
         }
       }
@@ -280,7 +300,7 @@
       }
     },
     "age": {
-      "label": "Age",
+      "label": "Âge",
       "component": "input",
       "family": "inputs",
       "mode": "single",
@@ -291,7 +311,7 @@
           "required": false
         },
         "content": {
-          "label": "Age",
+          "label": "Âge",
           "placeholder": "ex : 30",
           "helpText": ""
         }
@@ -327,8 +347,8 @@
         },
         "content": {
           "label": "Mot de passe",
-          "placeholder": "Min. 8 caracteres",
-          "helpText": "Majuscule, chiffre et caractere special recommandes."
+          "placeholder": "Min. 8 caractères",
+          "helpText": "Majuscule, chiffre et caractère spécial recommandés."
         }
       }
     },
@@ -345,7 +365,7 @@
         },
         "content": {
           "label": "Confirmer le mot de passe",
-          "placeholder": "Repetez le mot de passe",
+          "placeholder": "Répétez le mot de passe",
           "helpText": ""
         }
       }
@@ -391,8 +411,8 @@
         },
         "content": {
           "label": "Notifications par e-mail",
-          "labelOn": "Active",
-          "labelOff": "Desactive"
+          "labelOn": "Activé",
+          "labelOff": "Désactivé"
         }
       }
     },
@@ -408,8 +428,8 @@
         },
         "content": {
           "label": "Notifications par SMS",
-          "labelOn": "Active",
-          "labelOff": "Desactive"
+          "labelOn": "Activé",
+          "labelOff": "Désactivé"
         }
       }
     },
@@ -425,8 +445,8 @@
         },
         "content": {
           "label": "Recevoir la newsletter",
-          "labelOn": "Active",
-          "labelOff": "Desactive"
+          "labelOn": "Activé",
+          "labelOff": "Désactivé"
         }
       }
     },
@@ -441,7 +461,7 @@
           "checked": false
         },
         "content": {
-          "label": "J'accepte les conditions generales d'utilisation et la politique de confidentialite.",
+          "label": "J'accepte les conditions générales d'utilisation et la politique de confidentialité.",
           "errorMessage": "Vous devez accepter les conditions."
         }
       }
@@ -457,7 +477,7 @@
           "checked": false
         },
         "content": {
-          "label": "J'accepte de recevoir des offres commerciales personnalisees.",
+          "label": "J'accepte de recevoir des offres commerciales personnalisées.",
           "errorMessage": ""
         }
       }
@@ -490,7 +510,7 @@
           "full": false
         },
         "content": {
-          "text": "Creer mon compte"
+          "text": "Créer mon compte"
         }
       }
     }

@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Listing — MonSite</title>
-  <link rel="stylesheet" crossorigin href="/assets/style-CCz9vFMw.css">
+  <link rel="stylesheet" crossorigin href="/assets/style-YZfeh52v.css">
 </head>
 <body>
 
@@ -57,15 +57,27 @@
               </ul>
     </nav>
 
-    <div
-      class="header-nav__cta"
-      data-gf-node-type="part"
-      data-gf-node-id="cta"
-      data-gf-child-component="button"
-      data-gf-node-label="CTA"
-      data-gf-exposed="true"
-    >
+    <div class="header-nav__actions">
+              <button
+          class="header-nav__theme-toggle"
+          type="button"
+          aria-pressed="false"
+          aria-label="Activer le mode sombre"
+          data-theme-toggle
+        >
+          <span class="header-nav__theme-icon" aria-hidden="true">☾</span>
+          <span class="header-nav__theme-label">Mode sombre</span>
+        </button>
       
+      <div
+        class="header-nav__cta"
+        data-gf-node-type="part"
+        data-gf-node-id="cta"
+        data-gf-child-component="button"
+        data-gf-node-label="CTA"
+        data-gf-exposed="true"
+      >
+        
 <button
   class="btn btn--primary btn--sm"
   type="button"
@@ -73,8 +85,41 @@
   >
   Commencer
 </button>
+      </div>
     </div>
 
+          <script>
+        (() => {
+          const storageKey = 'open-ui-theme';
+          const root = document.documentElement;
+          const toggle = document.querySelector('[data-theme-toggle]');
+          if (!toggle) return;
+
+          const label = toggle.querySelector('.header-nav__theme-label');
+          const icon = toggle.querySelector('.header-nav__theme-icon');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const savedTheme = localStorage.getItem(storageKey);
+          const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+          const applyTheme = (theme) => {
+            const isDark = theme === 'dark';
+            root.dataset.theme = theme;
+            toggle.setAttribute('aria-pressed', String(isDark));
+            toggle.setAttribute('aria-label', isDark ? 'Activer le mode clair' : 'Activer le mode sombre');
+            if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+            if (icon) icon.textContent = isDark ? '☀' : '☾';
+          };
+
+          applyTheme(initialTheme);
+
+          toggle.addEventListener('click', () => {
+            const nextTheme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem(storageKey, nextTheme);
+            applyTheme(nextTheme);
+          });
+        })();
+      </script>
+    
   </div>
 </header>
 
@@ -108,7 +153,7 @@
 
           <span class="card__tag">Méthodo</span>
     
-    <h3 class="card__title">Introduction à l'Atomic Design</h3>
+    <h3 class="card__title">Introduction à l’Atomic Design</h3>
     <p class="card__text">Comprendre la méthode Atomic Design pour structurer vos interfaces de façon cohérente et maintenable.</p>
 
           <div
@@ -125,7 +170,7 @@
   type="button"
   data-gf-component="button"
   >
-  Lire l'article
+  Lire l’article
 </button>
       </div>
     
@@ -167,7 +212,7 @@
   type="button"
   data-gf-component="button"
   >
-  Lire l'article
+  Lire l’article
 </button>
       </div>
     
@@ -209,7 +254,7 @@
   type="button"
   data-gf-component="button"
   >
-  Lire l'article
+  Lire l’article
 </button>
       </div>
     
@@ -234,8 +279,8 @@
 
           <span class="card__tag">Tooling</span>
     
-    <h3 class="card__title">Vite.js en 2025 : ce qu'il faut savoir</h3>
-    <p class="card__text">Tour d'horizon des fonctionnalités clés de Vite.js et pourquoi c\'est devenu l\'outil de référence pour les projets front.</p>
+    <h3 class="card__title">Vite.js en 2025 : ce qu’il faut savoir</h3>
+    <p class="card__text">Tour d’horizon des fonctionnalités clés de Vite.js et pourquoi c’est devenu l’outil de référence pour les projets front.</p>
 
           <div
         class="card__footer"
@@ -251,7 +296,7 @@
   type="button"
   data-gf-component="button"
   >
-  Lire l'article
+  Lire l’article
 </button>
       </div>
     
@@ -277,7 +322,7 @@
           <span class="card__tag">CSS</span>
     
     <h3 class="card__title">BEM : la convention CSS qui scale</h3>
-    <p class="card__text">Pourquoi BEM reste la meilleure convention de nommage CSS pour les projets d'équipe, et comment l\'appliquer efficacement.</p>
+    <p class="card__text">Pourquoi BEM reste la meilleure convention de nommage CSS pour les projets d’équipe, et comment l’appliquer efficacement.</p>
 
           <div
         class="card__footer"
@@ -293,7 +338,7 @@
   type="button"
   data-gf-component="button"
   >
-  Lire l'article
+  Lire l’article
 </button>
       </div>
     
@@ -319,7 +364,7 @@
           <span class="card__tag">Twig</span>
     
     <h3 class="card__title">Twig pour les intégrateurs</h3>
-    <p class="card__text">Guide pratique du moteur de template Twig : syntaxe, filtres, includes et bonnes pratiques pour l'intégration HTML.</p>
+    <p class="card__text">Guide pratique du moteur de template Twig : syntaxe, filtres, includes et bonnes pratiques pour l’intégration HTML.</p>
 
           <div
         class="card__footer"
@@ -335,7 +380,49 @@
   type="button"
   data-gf-component="button"
   >
-  Lire l'article
+  Lire l’article
+</button>
+      </div>
+    
+  </div>
+
+</article>
+          </div>
+                  <div class="grid-item grid--cols-12 grid--sm-cols-6 grid--md-cols-4">
+            
+<article class="card card--default" data-gf-component="card">
+
+      <div class="card__media">
+      <img
+        class="card__image"
+        src="https://placehold.co/600x400/e0e7ff/3730a3?text=Composants"
+        alt="Illustration composants UI"
+        loading="lazy"
+      >
+    </div>
+  
+  <div class="card__body">
+
+          <span class="card__tag">Composants</span>
+    
+    <h3 class="card__title">Composer des interfaces avec des composants</h3>
+    <p class="card__text">Bonnes pratiques pour assembler des composants réutilisables sans casser la cohérence du design system.</p>
+
+          <div
+        class="card__footer"
+        data-gf-node-type="part"
+        data-gf-node-id="cta"
+        data-gf-child-component="button"
+        data-gf-node-label="CTA"
+        data-gf-exposed="true"
+      >
+        
+<button
+  class="btn btn--outline btn--sm"
+  type="button"
+  data-gf-component="button"
+  >
+  Lire l’article
 </button>
       </div>
     

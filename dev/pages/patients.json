@@ -1,19 +1,8 @@
 {
-  "name": "Page listing",
+  "name": "Page patients",
   "category": "Pages",
-  "description": "Page de liste d'articles avec header, grille de cards et footer.",
-  "variants": {
-    "gridCols": {
-      "label": "Colonnes",
-      "type": "select",
-      "default": "3",
-      "options": [
-        "1",
-        "2",
-        "3"
-      ]
-    }
-  },
+  "description": "Page de liste des patients avec recherche, filtres et résultats synthétiques.",
+  "variants": {},
   "content": {
     "header": {
       "label": "Header",
@@ -23,7 +12,7 @@
         "variant": "light",
         "sticky": true,
         "logoText": "MonSite",
-        "ctaText": "Commencer",
+        "ctaText": "Nouveau patient",
         "showThemeToggle": true,
         "themeToggleLabel": "Mode sombre"
       }
@@ -35,7 +24,7 @@
       "default": {
         "variant": "dark",
         "logoText": "MonSite",
-        "tagline": "Construisons quelque chose de grand.",
+        "tagline": "Suivi patient clair et organisé.",
         "copyright": "© 2025 MonSite. Tous droits réservés."
       }
     }
@@ -58,7 +47,7 @@
         },
         "content": {
           "logoText": "MonSite",
-          "ctaText": "Commencer",
+          "ctaText": "Nouveau patient",
           "themeToggleLabel": "Mode sombre"
         }
       }
@@ -74,54 +63,37 @@
         },
         "content": {
           "logoText": "MonSite",
-          "tagline": "Construisons quelque chose de grand.",
+          "tagline": "Suivi patient clair et organisé.",
           "copyright": "© 2025 MonSite. Tous droits réservés."
         }
       }
     },
-    "card": {
-      "label": "card",
-      "component": "card",
+    "input": {
+      "label": "Recherche patient",
+      "component": "input",
       "mode": "single",
       "autoBind": true
     },
-    "header-nav": {
-      "label": "header-nav",
-      "component": "header-nav",
+    "select": {
+      "label": "Filtres",
+      "component": "select",
+      "mode": "single",
+      "autoBind": true
+    },
+    "button": {
+      "label": "Actions filtres",
+      "component": "button",
       "mode": "single",
       "autoBind": true
     }
   },
   "collections": {
-    "articles": {
-      "label": "Cards listing",
+    "patients": {
+      "label": "Liste patients",
       "kind": "list",
-      "itemComponent": "card",
+      "itemComponent": "patient-row",
       "mode": "bulk",
-      "autoBind": true,
-      "defaults": {
-        "variants": {
-          "variant": "default",
-          "hasImage": true,
-          "hasCta": true
-        },
-        "content": {
-          "ctaText": "Lire l'article"
-        }
-      },
-      "exclude": {
-        "variants": [
-          "horizontal",
-          "ctaVariant",
-          "ctaSize",
-          "ctaFull",
-          "ctaDisabled"
-        ],
-        "content": [
-          "title",
-          "text"
-        ]
-      }
+      "autoBind": false
     }
   }
 }

@@ -2,18 +2,26 @@
   "name": "Header Nav",
   "level": "organism",
   "category": "Navigation",
-  "description": "En-tete de page avec logo, liens de navigation et bouton d'action principal.",
+  "description": "En-tête de page avec logo, liens de navigation, bouton d’action principal et bascule clair/sombre.",
   "variants": {
     "variant": {
       "label": "Variante",
       "type": "select",
       "default": "light",
-      "options": ["light", "dark"]
+      "options": [
+        "light",
+        "dark"
+      ]
     },
     "sticky": {
       "label": "Sticky",
       "type": "checkbox",
       "default": false
+    },
+    "showThemeToggle": {
+      "label": "Afficher la bascule thème",
+      "type": "checkbox",
+      "default": true
     }
   },
   "content": {
@@ -21,6 +29,11 @@
       "label": "Logo (texte)",
       "type": "text",
       "default": "MonSite"
+    },
+    "themeToggleLabel": {
+      "label": "Libellé bascule thème",
+      "type": "text",
+      "default": "Mode sombre"
     }
   },
   "parts": {

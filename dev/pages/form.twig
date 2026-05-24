@@ -17,6 +17,8 @@
     variant: previewHeader.variant|default('light'),
     sticky: previewHeader.sticky|default(true),
     logoText: previewHeader.logoText|default('MonSite'),
+  showThemeToggle: previewHeader.showThemeToggle|default(true),
+  themeToggleLabel: previewHeader.themeToggleLabel|default('Mode sombre'),
     cta: {
       variant: previewHeader.ctaVariant|default('primary'),
       size: previewHeader.ctaSize|default('md'),
@@ -29,7 +31,7 @@
     variant: previewFooter.variant|default('dark'),
     logoText: previewFooter.logoText|default('MonSite'),
     tagline: previewFooter.tagline|default('Construisons quelque chose de grand.'),
-    copyright: previewFooter.copyright|default('© 2025 MonSite. Tous droits reserves.')
+    copyright: previewFooter.copyright|default('© 2025 MonSite. Tous droits réservés.')
   } %}
 
   {% set inputFamily = previewFamilies.inputs.params|default({}) %}
@@ -43,6 +45,7 @@
   {% set lastNameField = inputFamily|merge(previewInstances.lastName.params|default({})) %}
   {% set emailField = inputFamily|merge(previewInstances.email.params|default({})) %}
   {% set phoneField = inputFamily|merge(previewInstances.phone.params|default({})) %}
+  {% set landlinePhoneField = inputFamily|merge(previewInstances.landlinePhone.params|default({})) %}
   {% set birthDateField = inputFamily|merge(previewInstances.birthDate.params|default({})) %}
   {% set ageField = inputFamily|merge(previewInstances.age.params|default({})) %}
   {% set countryField = selectFamily|merge(previewInstances.country.params|default({})) %}
@@ -62,6 +65,8 @@
     variant: header.variant,
     sticky: header.sticky,
     logoText: header.logoText,
+    showThemeToggle: header.showThemeToggle,
+    themeToggleLabel: header.themeToggleLabel,
     cta: header.cta,
     links: [
       { label: 'Accueil', href: '#' },
@@ -86,7 +91,7 @@
             <div class="grid-item grid--cols-12 grid--md-cols-6">
               {% include 'dev/components/input/input.twig' with {
                 id: 'prenom',
-                label: firstNameField.label|default('Prenom'),
+                label: firstNameField.label|default('Prénom'),
                 type: firstNameField.type|default('text'),
                 size: firstNameField.size|default('md'),
                 disabled: firstNameField.disabled|default(false),
@@ -114,7 +119,7 @@
           </div>
 
           <div class="grid grid--gap-lg" data-gf-component="grid">
-            <div class="grid-item grid--cols-12 grid--md-cols-6">
+            <div class="grid-item grid--cols-12 grid--md-cols-4">
               {% include 'dev/components/input/input.twig' with {
                 id: 'email',
                 label: emailField.label|default('Adresse e-mail'),
@@ -124,14 +129,14 @@
                 required: emailField.required|default(true),
                 hasError: emailField.hasError|default(false),
                 placeholder: emailField.placeholder|default('ex : jean@exemple.fr'),
-                helpText: emailField.helpText|default('Utilisee pour la connexion et les notifications.'),
+                helpText: emailField.helpText|default('Connexion et notifications.'),
                 errorMessage: emailField.errorMessage|default('Ce champ est invalide.')
               } %}
             </div>
-            <div class="grid-item grid--cols-12 grid--md-cols-6">
+            <div class="grid-item grid--cols-12 grid--md-cols-4">
               {% include 'dev/components/input/input.twig' with {
                 id: 'tel',
-                label: phoneField.label|default('Telephone'),
+                label: phoneField.label|default('Téléphone'),
                 type: phoneField.type|default('tel'),
                 size: phoneField.size|default('md'),
                 disabled: phoneField.disabled|default(false),
@@ -140,6 +145,20 @@
                 placeholder: phoneField.placeholder|default('ex : +33 6 12 34 56 78'),
                 helpText: phoneField.helpText|default(''),
                 errorMessage: phoneField.errorMessage|default('Ce champ est invalide.')
+              } %}
+            </div>
+            <div class="grid-item grid--cols-12 grid--md-cols-4">
+              {% include 'dev/components/input/input.twig' with {
+                id: 'tel-fixe',
+                label: landlinePhoneField.label|default('Tél. fixe'),
+                type: landlinePhoneField.type|default('tel'),
+                size: landlinePhoneField.size|default('md'),
+                disabled: landlinePhoneField.disabled|default(false),
+                required: landlinePhoneField.required|default(false),
+                hasError: landlinePhoneField.hasError|default(false),
+                placeholder: landlinePhoneField.placeholder|default('ex : +33 5 12 34 56 78'),
+                helpText: landlinePhoneField.helpText|default(''),
+                errorMessage: landlinePhoneField.errorMessage|default('Ce champ est invalide.')
               } %}
             </div>
           </div>
@@ -162,7 +181,7 @@
             <div class="grid-item grid--cols-12 grid--md-cols-4">
               {% include 'dev/components/input/input.twig' with {
                 id: 'age',
-                label: ageField.label|default('Age'),
+                label: ageField.label|default('Âge'),
                 type: ageField.type|default('number'),
                 size: ageField.size|default('md'),
                 disabled: ageField.disabled|default(false),
@@ -183,7 +202,7 @@
                 hasError: countryField.hasError|default(false),
                 placeholder: countryField.placeholder|default('Choisissez un pays'),
                 helpText: countryField.helpText|default(''),
-                errorMessage: countryField.errorMessage|default('Veuillez selectionner une option.'),
+                errorMessage: countryField.errorMessage|default('Veuillez sélectionner une option.'),
                 options: [
                   { value: 'fr', label: 'France' },
                   { value: 'be', label: 'Belgique' },
@@ -209,8 +228,8 @@
                 disabled: passwordField.disabled|default(false),
                 required: passwordField.required|default(true),
                 hasError: passwordField.hasError|default(false),
-                placeholder: passwordField.placeholder|default('Min. 8 caracteres'),
-                helpText: passwordField.helpText|default('Majuscule, chiffre et caractere special recommandes.'),
+                placeholder: passwordField.placeholder|default('Min. 8 caractères'),
+                helpText: passwordField.helpText|default('Majuscule, chiffre et caractère spécial recommandés.'),
                 errorMessage: passwordField.errorMessage|default('Ce champ est invalide.')
               } %}
             </div>
@@ -223,7 +242,7 @@
                 disabled: passwordConfirmField.disabled|default(false),
                 required: passwordConfirmField.required|default(true),
                 hasError: passwordConfirmField.hasError|default(false),
-                placeholder: passwordConfirmField.placeholder|default('Repetez le mot de passe'),
+                placeholder: passwordConfirmField.placeholder|default('Répétez le mot de passe'),
                 helpText: passwordConfirmField.helpText|default(''),
                 errorMessage: passwordConfirmField.errorMessage|default('Ce champ est invalide.')
               } %}
@@ -241,9 +260,9 @@
                 hasError: profileField.hasError|default(false),
                 placeholder: profileField.placeholder|default('Choisissez un profil'),
                 helpText: profileField.helpText|default(''),
-                errorMessage: profileField.errorMessage|default('Veuillez selectionner une option.'),
+                errorMessage: profileField.errorMessage|default('Veuillez sélectionner une option.'),
                 options: [
-                  { value: 'dev', label: 'Developpeur' },
+                  { value: 'dev', label: 'Développeur' },
                   { value: 'designer', label: 'Designer' },
                   { value: 'manager', label: 'Chef de projet' },
                   { value: 'other', label: 'Autre' }
@@ -281,8 +300,8 @@
                   checked: notifEmailField.checked|default(true),
                   disabled: notifEmailField.disabled|default(false),
                   size: notifEmailField.size|default('md'),
-                  labelOn: notifEmailField.labelOn|default('Active'),
-                  labelOff: notifEmailField.labelOff|default('Desactive')
+                  labelOn: notifEmailField.labelOn|default('Activé'),
+                  labelOff: notifEmailField.labelOff|default('Désactivé')
                 } %}
                 {% include 'dev/components/switch/switch.twig' with {
                   id: 'notif-sms',
@@ -290,8 +309,8 @@
                   checked: notifSmsField.checked|default(false),
                   disabled: notifSmsField.disabled|default(false),
                   size: notifSmsField.size|default('md'),
-                  labelOn: notifSmsField.labelOn|default('Active'),
-                  labelOff: notifSmsField.labelOff|default('Desactive')
+                  labelOn: notifSmsField.labelOn|default('Activé'),
+                  labelOff: notifSmsField.labelOff|default('Désactivé')
                 } %}
                 {% include 'dev/components/switch/switch.twig' with {
                   id: 'newsletter',
@@ -299,8 +318,8 @@
                   checked: newsletterField.checked|default(true),
                   disabled: newsletterField.disabled|default(false),
                   size: newsletterField.size|default('md'),
-                  labelOn: newsletterField.labelOn|default('Active'),
-                  labelOff: newsletterField.labelOff|default('Desactive')
+                  labelOn: newsletterField.labelOn|default('Activé'),
+                  labelOff: newsletterField.labelOff|default('Désactivé')
                 } %}
               </div>
             </div>
@@ -312,7 +331,7 @@
 
           {% include 'dev/components/checkbox/checkbox.twig' with {
             id: 'cgu',
-            label: termsField.label|default("J'accepte les conditions generales d'utilisation et la politique de confidentialite."),
+            label: termsField.label|default("J'accepte les conditions générales d'utilisation et la politique de confidentialité."),
             checked: termsField.checked|default(false),
             disabled: termsField.disabled|default(false),
             hasError: termsField.hasError|default(false),
@@ -321,7 +340,7 @@
           } %}
           {% include 'dev/components/checkbox/checkbox.twig' with {
             id: 'marketing',
-            label: marketingField.label|default("J'accepte de recevoir des offres commerciales personnalisees."),
+            label: marketingField.label|default("J'accepte de recevoir des offres commerciales personnalisées."),
             checked: marketingField.checked|default(false),
             disabled: marketingField.disabled|default(false),
             hasError: marketingField.hasError|default(false),
@@ -338,7 +357,7 @@
             disabled: cancelAction.disabled|default(false)
           } %}
           {% include 'dev/components/button/button.twig' with {
-            text: submitAction.text|default('Creer mon compte'),
+            text: submitAction.text|default('Créer mon compte'),
             variant: submitAction.variant|default('primary'),
             size: submitAction.size|default('md'),
             full: submitAction.full|default(false),
