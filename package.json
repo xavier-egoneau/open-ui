@@ -1,7 +1,7 @@
 {
   "name": "open-ui",
   "version": "2.0.0",
-  "description": "Open UI — agent-first design system & design builder",
+  "description": "Open UI — agent-first design system workspace",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,9 @@
     "lint:scss": "stylelint \"dev/assets/scss/**/*.scss\"",
     "test:a11y": "node scripts/test-a11y.js",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "impact": "node scripts/impact.js",
+    "clean": "node scripts/clean-build.js"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
@@ -28,13 +30,5 @@
     "twig": "^3.0.0",
     "vite": "^6.0.0",
     "vitest": "^3.0.0"
-  },
-  "dependencies": {
-    "@codemirror/commands": "^6.10.3",
-    "@codemirror/lang-html": "^6.4.11",
-    "@codemirror/lang-json": "^6.0.2",
-    "@codemirror/state": "^6.6.0",
-    "@codemirror/theme-one-dark": "^6.1.3",
-    "@codemirror/view": "^6.41.0"
   }
 }

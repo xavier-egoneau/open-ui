@@ -1,4 +1,4 @@
-# GUIDELINES_AI.md - Go-fast v2
+# GUIDELINES_AI.md - Open UI
 
 > Document universel. Toute IA qui lit ce fichier doit pouvoir creer un composant conforme sans autre explication.
 
@@ -12,7 +12,7 @@
 | **Molecule** | `"molecule"` | `dev/components/[nom]/` | Composition d'atoms : champ de formulaire, carte, tag group |
 | **Organism** | `"organism"` | `dev/components/[nom]/` | Composition de molecules : header, formulaire complet, nav |
 | **Template** | `"template"` | `dev/components/[nom]/` | Structure de page avec zones de contenu, sans contenu reel |
-| **Page** | `"page"` ou page JSON sans `level` | `dev/pages/` | Instance d'un template avec contenu reel. JSON optionnel pour exposer des controles dans le showcase. |
+| **Page** | `"page"` ou page JSON sans `level` | `dev/pages/` | Instance d'un template avec contenu reel. JSON optionnel pour exposer des controles dans l’espace de travail. |
 
 Regle fondamentale : la composition est toujours descendante. Un atom n'inclut jamais une molecule. Un organism n'inclut jamais un template.
 
@@ -24,7 +24,7 @@ Chaque composant `[nom]` en `kebab-case` vit dans `dev/components/` :
 
 ```text
 dev/components/[nom]/
-|- [nom].json   <- Source de verite : metadonnees + controles du showcase
+|- [nom].json   <- Source de verite : metadonnees + controles de l’espace de travail
 |- [nom].twig   <- Template de rendu
 `- [nom].md     <- Documentation obligatoire
 ```
@@ -138,7 +138,7 @@ Semantique :
 ```
 
 Champs supportes :
-- `label` : libelle affiche dans l'inspector
+- `label` : libelle affiche dans l’inspecteur agentique
 - `component` : id du composant canonique reference
 - `mode` : `single` uniquement pour l'instant
 - `binding` : mapping explicite enfant -> parent
@@ -169,7 +169,7 @@ Champs supportes :
 ```
 
 Champs supportes :
-- `label` : libelle affiche dans l'inspector
+- `label` : libelle affiche dans l’inspecteur agentique
 - `kind` : type semantique de repetition. Utiliser `list` pour une vraie liste editable en bulk
 - `itemComponent` : composant canonique de chaque item
 - `mode` : `bulk` uniquement pour l'instant
@@ -239,7 +239,7 @@ Utiliser `exclude` pour ne pas exposer automatiquement certains champs enfant.
 Cas typiques :
 - une collection de `card` ne doit pas bulk-editer `title` ou `text`
 - un parent veut figer `horizontal`
-- un champ existe techniquement mais n'a pas d'interet produit dans l'inspector
+- un champ existe techniquement mais n'a pas d'interet produit dans l’inspecteur agentique
 
 ### Regles d'usage JSON v2
 
@@ -590,10 +590,10 @@ dev/components/[nom]/
 
 ### Etape 7 - Verifier
 
-- le showcase se regenere correctement
+- la cartographie et le rendu se régénèrent correctement
 - le composant apparait dans la liste
 - les controles JSON pilotent bien le rendu
-- les sous-composants et collections s'affichent correctement dans l'inspector si le composant est compose
+- les sous-composants et collections restent détectables si le composant est composé
 
 ---
 
@@ -668,7 +668,7 @@ Usage de l'atom `icon` :
 
 ## 12. Separation `app/` vs `dev/`
 
-- `app/` -> framework showcase. Ne jamais modifier.
+- `app/` -> réservé à une future interface. Ne pas utiliser tant que le noyau agentique n’est pas stabilisé.
 - `dev/` -> projet utilisateur. C'est ici que travaille l'integrateur.
 
 Les styles de `app/` ne doivent pas affecter le rendu des composants `dev/`.

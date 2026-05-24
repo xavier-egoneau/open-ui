@@ -1,5 +1,5 @@
 // =============================================================================
-// style.scss — test
+// style.scss — Open UI
 // =============================================================================
 
 // Base
@@ -9,7 +9,7 @@
 @use 'base/mixins';
 @use 'base/forms';
 
-// Layout système (ne pas modifier — couplé au Design Surface)
+// Layout système
 @use 'layout/grid';
 
 // Components

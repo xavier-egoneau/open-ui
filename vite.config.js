@@ -97,6 +97,7 @@ export default defineConfig({
   server: {
     port: 3000
   },
+  publicDir: false,
   build: {
     outDir: 'public',
     emptyOutDir: true
