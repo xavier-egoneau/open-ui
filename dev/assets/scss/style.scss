@@ -1,0 +1,31 @@
+// =============================================================================
+// style.scss — test
+// =============================================================================
+
+// Base
+@use 'base/variables';
+@use 'base/reset';
+@use 'base/typography';
+@use 'base/mixins';
+@use 'base/forms';
+
+// Layout système (ne pas modifier — couplé au Design Surface)
+@use 'layout/grid';
+
+// Components
+@use 'components/button';
+@use 'components/input';
+@use 'components/select';
+@use 'components/checkbox';
+@use 'components/radio';
+@use 'components/switch';
+@use 'components/header-nav';
+@use 'components/card';
+@use 'components/footer';
+
+// Pages
+@use 'components/listing-page';
+@use 'components/form-page';
+@use 'components/alert';
+@use 'components/dropdown';
+@use 'components/select-custom';

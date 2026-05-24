@@ -1,0 +1,64 @@
+{% set variant  = variant|default('light') %}
+{% set sticky   = sticky|default(false) %}
+{% set logoText = logoText|default('MonSite') %}
+{% set previewCta = __previewParts.cta.params|default(cta|default({})) %}
+{% set cta = {
+  variant: previewCta.variant|default('auto'),
+  size: previewCta.size|default('sm'),
+  full: previewCta.full|default(false),
+  disabled: previewCta.disabled|default(false),
+  text: previewCta.text|default('Commencer')
+} %}
+
+{% set links = links|default([
+  { label: 'Accueil',    href: '#' },
+  { label: 'Produits',   href: '#' },
+  { label: 'Tarifs',     href: '#' },
+  { label: 'Contact',    href: '#' }
+]) %}
+
+{% set resolvedCtaVariant = cta.variant == 'auto' ? (variant == 'dark' ? 'outline' : 'primary') : cta.variant %}
+
+<header class="header-nav header-nav--{{ variant }}{% if sticky %} header-nav--sticky{% endif %}" role="banner" data-gf-component="header-nav">
+  <div class="header-nav__inner">
+
+    <a href="/" class="header-nav__logo" aria-label="Retour à l'accueil">
+      <span class="header-nav__logo-mark" aria-hidden="true">◈</span>
+      <span class="header-nav__logo-name">{{ logoText }}</span>
+    </a>
+
+    <nav class="header-nav__nav" aria-label="Navigation principale">
+      <ul class="header-nav__list" role="list">
+        {% for link in links %}
+          <li class="header-nav__item">
+            <a
+              href="{{ link.href|default('#') }}"
+              class="header-nav__link{% if link.active|default(false) %} header-nav__link--active{% endif %}"
+              {% if link.active|default(false) %}aria-current="page"{% endif %}
+            >
+              {{ link.label|default('Lien') }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <div
+      class="header-nav__cta"
+      data-gf-node-type="part"
+      data-gf-node-id="cta"
+      data-gf-child-component="button"
+      data-gf-node-label="CTA"
+      data-gf-exposed="true"
+    >
+      {% include 'dev/components/button/button.twig' with {
+        text: cta.text,
+        variant: resolvedCtaVariant,
+        size: cta.size,
+        full: cta.full,
+        disabled: cta.disabled
+      } %}
+    </div>
+
+  </div>
+</header>

@@ -1,0 +1,40 @@
+{
+  "name": "open-ui",
+  "version": "2.0.0",
+  "description": "Open UI — agent-first design system & design builder",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "icons": "node scripts/generate-icons.js",
+    "list": "node scripts/list-components.js",
+    "validate": "node scripts/validate-json.js",
+    "lint:scss": "stylelint \"dev/assets/scss/**/*.scss\"",
+    "test:a11y": "node scripts/test-a11y.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "autoprefixer": "^10.4.0",
+    "axe-core": "^4.10.0",
+    "postcss": "^8.4.0",
+    "prismjs": "^1.30.0",
+    "sass": "^1.80.0",
+    "stylelint": "^16.0.0",
+    "stylelint-config-standard-scss": "^13.0.0",
+    "tailwindcss": "^4.0.0",
+    "twig": "^3.0.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.10.3",
+    "@codemirror/lang-html": "^6.4.11",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/state": "^6.6.0",
+    "@codemirror/theme-one-dark": "^6.1.3",
+    "@codemirror/view": "^6.41.0"
+  }
+}

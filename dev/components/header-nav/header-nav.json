@@ -1,0 +1,45 @@
+{
+  "name": "Header Nav",
+  "level": "organism",
+  "category": "Navigation",
+  "description": "En-tete de page avec logo, liens de navigation et bouton d'action principal.",
+  "variants": {
+    "variant": {
+      "label": "Variante",
+      "type": "select",
+      "default": "light",
+      "options": ["light", "dark"]
+    },
+    "sticky": {
+      "label": "Sticky",
+      "type": "checkbox",
+      "default": false
+    }
+  },
+  "content": {
+    "logoText": {
+      "label": "Logo (texte)",
+      "type": "text",
+      "default": "MonSite"
+    }
+  },
+  "parts": {
+    "cta": {
+      "label": "CTA",
+      "component": "button",
+      "mode": "single",
+      "autoBind": true,
+      "defaults": {
+        "variants": {
+          "variant": "auto",
+          "size": "sm",
+          "full": false,
+          "disabled": false
+        },
+        "content": {
+          "text": "Commencer"
+        }
+      }
+    }
+  }
+}
