@@ -5,6 +5,9 @@ import Twig from 'twig'
 
 const ROOT = process.cwd()
 const PAGES_DIR = path.join(ROOT, 'dev/pages')
+const SKETCHES_DIR = path.join(ROOT, 'dev/sketches')
+const OUT_DIR = path.join(ROOT, 'public')
+const PUBLIC_SKETCHES_DIR = path.join(OUT_DIR, 'sketches')
 const FULL_RELOAD_DELAY = 150
 
 // Les includes utilisent des chemins depuis la racine ('dev/components/...')
@@ -17,6 +20,30 @@ function renderTwig(filePath, data = {}) {
       else resolve(html)
     })
   })
+}
+
+function copySketchesToPublic() {
+  if (!fs.existsSync(SKETCHES_DIR)) return
+  fs.rmSync(PUBLIC_SKETCHES_DIR, { recursive: true, force: true })
+  fs.cpSync(SKETCHES_DIR, PUBLIC_SKETCHES_DIR, { recursive: true })
+}
+
+function serveFile(filePath, res) {
+  const ext = path.extname(filePath)
+  const contentTypes = {
+    '.html': 'text/html; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.js': 'text/javascript; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.svg': 'image/svg+xml',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.webp': 'image/webp'
+  }
+
+  res.setHeader('Content-Type', contentTypes[ext] || 'application/octet-stream')
+  res.end(fs.readFileSync(filePath))
 }
 
 function openUIPlugin() {
@@ -42,7 +69,7 @@ function openUIPlugin() {
       cfg.build.rollupOptions.input = inputs
     },
 
-    // Build : nettoie les HTML temporaires après le bundle
+    // Build : nettoie les HTML temporaires puis publie les esquisses séparément
     closeBundle() {
       const pages = fs.existsSync(PAGES_DIR)
         ? fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.twig'))
@@ -51,22 +78,40 @@ function openUIPlugin() {
         const tmpPath = path.join(ROOT, file.replace('.twig', '.html'))
         if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath)
       }
+      copySketchesToPublic()
     },
 
-    // Dev : rendu Twig à la volée
+    // Dev : rendu Twig à la volée + preview des esquisses hors DS canonique
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const pathname = new URL(req.url, 'http://localhost').pathname
+
+        if (pathname.startsWith('/sketches/')) {
+          const relativePath = decodeURIComponent(pathname.replace('/sketches/', ''))
+          const requestedPath = path.normalize(path.join(SKETCHES_DIR, relativePath))
+          if (!requestedPath.startsWith(SKETCHES_DIR)) return next()
+          const filePath = fs.existsSync(requestedPath) && fs.statSync(requestedPath).isDirectory()
+            ? path.join(requestedPath, 'index.html')
+            : requestedPath
+          if (!fs.existsSync(filePath)) return next()
+          serveFile(filePath, res)
+          return
+        }
+
         const slug = pathname === '/' ? null : pathname.slice(1).replace(/\.html$/, '')
 
-        // Index : liste des pages disponibles
+        // Index : liste des pages disponibles et esquisses séparées
         if (!slug) {
           const pages = fs.existsSync(PAGES_DIR)
             ? fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.twig')).map(f => f.replace('.twig', ''))
             : []
-          const links = pages.map(p => `<li><a href="/${p}.html">${p}</a></li>`).join('\n')
+          const sketches = fs.existsSync(SKETCHES_DIR)
+            ? fs.readdirSync(SKETCHES_DIR, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name)
+            : []
+          const pageLinks = pages.map(p => `<li><a href="/${p}.html">${p}</a></li>`).join('\n')
+          const sketchLinks = sketches.map(s => `<li><a href="/sketches/${s}/">${s}</a> <small>sketch</small></li>`).join('\n')
           res.setHeader('Content-Type', 'text/html; charset=utf-8')
-          res.end(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Pages</title></head><body><ul>${links}</ul></body></html>`)
+          res.end(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Pages</title></head><body><h1>Pages</h1><ul>${pageLinks}</ul><h2>Sketches</h2><ul>${sketchLinks}</ul></body></html>`)
           return
         }
 
@@ -85,9 +130,9 @@ function openUIPlugin() {
       })
     },
 
-    // HMR : rechargement complet sur changement .twig
+    // HMR : rechargement complet sur changement .twig ou esquisse
     handleHotUpdate({ file, server }) {
-      if (file.endsWith('.twig')) {
+      if (file.endsWith('.twig') || file.includes(`${path.sep}dev${path.sep}sketches${path.sep}`)) {
         clearTimeout(fullReloadTimer)
         fullReloadTimer = setTimeout(() => {
           server.ws.send({ type: 'full-reload' })
