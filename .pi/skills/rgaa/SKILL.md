@@ -1,7 +1,6 @@
 ---
 name: rgaa
 description: Skill RGAA generaliste base sur la methode officielle RGAA 4.1.2. A utiliser pour prevenir, relire ou corriger l'accessibilite de composants UI, bibliotheques de composants, pages HTML/Twig, formulaires, navigation, scripts/interactions, images, tableaux et contenus. Ne remplace pas un audit legal complet.
-commands: rgaa-check-component, rgaa-check-page, rgaa-review, rgaa-map-criteria
 ---
 
 # Skill RGAA

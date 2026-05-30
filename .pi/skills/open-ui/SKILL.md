@@ -1,7 +1,7 @@
 ---
 name: open-ui
-description: Skill projet pour Open UI : gardien agent-first du design system. À utiliser pour cartographier composants/pages/tokens, analyser les impacts, choisir entre composant/page/variante/token, modifier prudemment, vérifier le rendu navigateur, maintenir docs, appliquer une vision RGAA via le skill rgaa et intégrer les retours critiques via MEMORY.md. Le mode maquette libre se déclenche explicitement via /open-ui-sketch et reste hors design system canonique.
-commands: open-ui-map, open-ui-impact, open-ui-modify, open-ui-create-component, open-ui-sketch, open-ui-check, open-ui-review, open-ui-rgaa-check, open-ui-cleanup, open-ui-docs, open-ui-critic
+description: >-
+  Skill projet pour Open UI : gardien agent-first du design system. À utiliser pour cartographier composants/pages/tokens, analyser les impacts, choisir entre composant/page/variante/token, modifier prudemment, vérifier le rendu navigateur, maintenir docs, appliquer une vision RGAA via le skill rgaa et intégrer les retours critiques via MEMORY.md. Le mode maquette libre se déclenche explicitement via le prompt /open-ui-sketch et reste hors design system canonique.
 ---
 
 # Skill projet : Open UI
@@ -59,11 +59,11 @@ Toute demande normale sur une page, un composant, une variante, une navigation, 
 
 Même si l'utilisateur demande vite une modification, ne pas basculer en maquette libre sans signal clair. Une demande vague ne signifie pas "improvise librement" ; elle signifie souvent "cadre d'abord".
 
-### Mode maquette libre — `/open-ui-sketch` uniquement
+### Mode maquette libre — prompt `/open-ui-sketch` uniquement
 
 Le mode maquette libre sert à tester une direction visuelle ou produit en début de projet. Il est volontairement séparé du design system canonique.
 
-Déclencheurs acceptés : commande `/open-ui-sketch` ou demande explicite du type "maquette libre", "exploration visuelle", "brouillon", "sketch", "teste une direction sans intégrer au DS".
+Déclencheurs acceptés : prompt `/open-ui-sketch` ou demande explicite du type "maquette libre", "exploration visuelle", "brouillon", "sketch", "teste une direction sans intégrer au DS".
 
 Dans ce mode :
 
@@ -155,7 +155,7 @@ Créer un composant canonique seulement si la réutilisation ou une variante exi
 
 Une esquisse explore une maquette ou idée. Elle ne doit pas être présentée comme composant canonique tant qu'elle n'a pas été consolidée. Marquer clairement son statut exploratoire.
 
-Le tunnel recommandé pour les esquisses est la commande `/open-ui-sketch`. Hors de cette commande, ne pas considérer une demande floue comme autorisation de faire une maquette libre : cadrer ou rester dans le design system.
+Le tunnel recommandé pour les esquisses est le prompt `/open-ui-sketch`. Hors de ce prompt, ne pas considérer une demande floue comme autorisation de faire une maquette libre : cadrer ou rester dans le design system.
 
 ## Nettoyage
 
@@ -172,6 +172,6 @@ Quand l'utilisateur critique une livraison Open UI :
 5. Utiliser `design-memory` pour décider quoi stabiliser dans `MEMORY.md`, quoi garder comme provenance, et quoi transformer en règle de skill.
 6. Compacter/fusionner les doublons plutôt qu'empiler l'historique.
 
-## Commandes
+## Prompts de commande
 
-Les commandes dans `core/` sont préfixées par `open-ui-` pour rester lisibles dans `/help` et éviter les collisions. Elles doivent agir réellement : lire, modifier si demandé, tester et résumer.
+Les fichiers dans `core/` sont répliqués comme prompt templates dans `.pi/prompts/` avec le préfixe `open-ui-` pour être invocables via `/open-ui-*` et éviter les collisions. Ils doivent agir réellement : lire, modifier si demandé, tester et résumer.

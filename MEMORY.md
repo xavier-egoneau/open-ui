@@ -40,13 +40,14 @@ Open UI explore un framework agentique de design/dev UI : l'agent peut concevoir
 - Design system protected : les composants, tokens et conventions partagés restent protégés par défaut.
 - Critique loop : les retours utilisateur doivent devenir des règles utiles, pas un journal infini.
 - Visual ambition with control : le mode sketch doit chercher du caractère sans perdre lisibilité, accessibilité et faisabilité.
+- Design d'attention pour outils critiques : pour une app médicale ou experte de suivi quotidien, guider le regard vers qui regarder maintenant, pourquoi c'est important, quelle décision prendre et ce qui peut attendre, plutôt qu'exposer tous les modules avec le même poids.
 
 ### Langage visuel
 
 - Densité : variable selon le mode ; dense et contrôlée pour le design system, plus expressive en sketch.
 - Typographie : à définir par projet ou esquisse.
 - Couleurs : à définir par projet ou esquisse ; éviter les palettes IA génériques par défaut.
-- Surfaces : éviter la sur-utilisation de cards ; préférer des structures qui servent la lecture.
+- Surfaces : éviter la sur-utilisation de cards ; préférer des structures discrètes, implicites ou typographiques qui servent la lecture et l'attention.
 - Iconographie : fonctionnelle d'abord.
 - Média / illustration : utile en sketch si elle porte l'identité ou le contexte.
 - Motion : utile seulement si elle explique une relation, un changement d'état ou une transition.
@@ -77,6 +78,8 @@ Open UI explore un framework agentique de design/dev UI : l'agent peut concevoir
 - Reprendre le design d'anciens sketches sauf demande explicite ou référence claire de l'utilisateur.
 - Faire du "modern clean" générique.
 - Ajouter des cartes, gradients ou effets visuels sans rôle produit.
+- En plein écran, utiliser une structure trop visible type chrome applicatif + panneaux/cards systématiques : cela vieillit vite le rendu et peut évoquer le web des années 2008.
+- Pour les outils médicaux ou experts, produire un dashboard de cards quand le besoin réel est un design d'attention orienté décision.
 - Garder des apprentissages en doublon entre `MEMORY.md` et les skills.
 
 ### Questions ouvertes
@@ -155,3 +158,30 @@ Après suppression des anciens sketches santé, l'utilisateur a demandé trois d
 **Suite utile**
 - La règle normative est ajoutée dans la direction stabilisée et `design-sketching`.
 - Sketch créé dans `dev/sketches/health-art-directions/`, publié dans `public/sketches/health-art-directions/`.
+
+### 2026-05-29 — Plein écran santé : structure trop visible
+
+**Contexte**  
+Sur trois propositions HTML pour une app santé, les directions étaient différentes en surface mais reposaient sur la même stratégie visuelle : page occupée par un chrome applicatif lourd, panneaux très visibles et cartes. L'utilisateur a jugé que cela produisait immédiatement un effet daté, proche web 2008.
+
+**À retenir**
+- Une interface plein écran ne doit pas nécessairement remplir l'espace par des blocs visibles ; elle peut reposer sur des lignes, colonnes implicites, typographie, blancs et hiérarchie.
+- Si trois directions DA sont demandées, varier aussi le niveau de visibilité de la structure : grille documentaire, page éditoriale, matrice experte, etc.
+- Éviter de répliquer sidebar + topbar + cards sur toutes les pistes.
+
+**Suite utile**
+- La direction stabilisée rappelle d'éviter le chrome applicatif lourd en plein écran.
+- Les trois HTML ont été repris dans `dev/sketches/health-da-three-directions/` avec une structure plus dissoute.
+
+### 2026-05-29 — Design d'attention validé pour app santé
+
+**Contexte**  
+Après comparaison entre les premières propositions dashboard et les versions plus dissoutes, l'utilisateur a validé que le design d'attention était beaucoup plus intéressant.
+
+**À retenir**
+- Pour une app médicale de suivi quotidien, l'interface doit orienter le regard plutôt qu'exposer des modules équivalents.
+- La priorité de lecture est : qui regarder maintenant, pourquoi c'est important, quelle décision prendre, ce qui peut attendre.
+- La richesse visuelle vient de la hiérarchie, du rythme, du vide, des lignes et de la typographie, pas de l'accumulation de cartes.
+
+**Suite utile**
+- Règle ajoutée dans la direction stabilisée : privilégier le design d'attention pour les outils critiques/médicaux.
