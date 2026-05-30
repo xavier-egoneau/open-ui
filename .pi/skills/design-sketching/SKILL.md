@@ -99,4 +99,5 @@ Par defaut, eviter :
 
 - Pour les principes generiques : lire `references/sketch-principles.md`.
 - Pour choisir des axes creatifs : lire `references/visual-directions.md`.
+- Pour le craft visuel de base (espacement, typo, couleur, surfaces, signaux contemporains) : lire `references/design-craft.md`. Ce fichier est obligatoire pour tout sketch — il encode ce qu'un designer senior applique par défaut.
 - Pour transformer une direction retenue en regles projet : utiliser `design-memory`.
