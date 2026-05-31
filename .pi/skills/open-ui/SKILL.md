@@ -32,10 +32,11 @@ L'effort premier porte sur la structure durable du projet : comprendre les compo
 - `docs/design-tokens.md` : règles tokens/design system.
 - `docs/project-workspaces.md` : cible multi-projets.
 - `docs/sketches.md` : différence esquisse vs composant canonique et tunnel maquette libre.
-- `.marius/skills/rgaa/` : revue RGAA generaliste pour composants, pages, formulaires, navigation et interactions.
-- `.marius/skills/design-sketching/` : divergence créative en mode esquisse.
-- `.marius/skills/design-critique/` : relecture UI/UX et diagnostic visuel.
-- `.marius/skills/design-memory/` : maintien de `MEMORY.md` et promotion des apprentissages.
+- `.pi/skills/rgaa/` : revue RGAA generaliste pour composants, pages, formulaires, navigation et interactions.
+- `.pi/skills/design-sketching/` : divergence créative en mode esquisse.
+- `.pi/skills/sketch-to-production/` : consolidation d'une esquisse retenue vers composant, variante, page, token ou pattern canonique.
+- `.pi/skills/design-critique/` : relecture UI/UX et diagnostic visuel.
+- `.pi/skills/design-memory/` : maintien de `MEMORY.md` et promotion des apprentissages.
 - `scripts/design-system.js`, `scripts/list-components.js`, `scripts/impact.js`, `scripts/validate-json.js` : cartographie et validation.
 
 ## Principes non négociables
@@ -75,6 +76,24 @@ Dans ce mode :
 - documenter ce qu'il faudrait consolider ensuite : composants à extraire, tokens à créer, variantes à stabiliser, impacts à analyser, points RGAA à reprendre.
 
 Sortie attendue du mode sketch : une proposition visualisable + une section "À consolider si on garde cette direction".
+
+### Mode consolidation — prompt `/open-ui-consolidate-sketch`
+
+Le mode consolidation sert quand une esquisse ou direction retenue doit devenir production. Il est distinct du mode sketch : on ne cherche plus de nouvelles directions, on extrait un contrat durable.
+
+Déclencheurs acceptés : prompt `/open-ui-consolidate-sketch` ou demande explicite du type "on garde ce sketch", "passe cette maquette en composant", "industrialise cette direction", "integre cette piste dans le design system", "consolide l'esquisse".
+
+Dans ce mode :
+
+- charger le skill `sketch-to-production` ;
+- relire le sketch source et sa section "À consolider si on garde cette direction" si elle existe ;
+- décider le niveau d'intégration : composant canonique, variante, composition, page locale, token ou pattern documenté ;
+- cartographier les composants/tokens/pages proches avant de créer ;
+- ne pas copier-coller le code expérimental comme production ;
+- appliquer les garde-fous Open UI : impact, docs, validations, RGAA et vérification visuelle ;
+- utiliser `design-memory` si la direction devient une décision projet durable.
+
+Sortie attendue du mode consolidation : source retenue + choix d'intégration + fichiers modifiés + impacts/validations + preuve visuelle + ce qui reste hors production.
 
 ## Check d'intention avant modification
 

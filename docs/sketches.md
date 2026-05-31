@@ -22,6 +22,7 @@ Une demande vague ne suffit pas a basculer en esquisse : dans ce cas, il faut ca
 - Une esquisse ne doit pas modifier des composants canoniques, tokens globaux ou conventions partagees sans confirmation explicite.
 - Si une esquisse devient utile, elle doit etre promue en composant canonique avec JSON, Twig, Markdown et SCSS propres.
 - La promotion doit inclure une analyse d'impact, les variantes/tokens necessaires et une verification RGAA selon la cible.
+- La promotion passe par `/open-ui-consolidate-sketch` et le skill `sketch-to-production`.
 
 ## Difference avec un composant canonique
 
@@ -41,6 +42,21 @@ Une demande vague ne suffit pas a basculer en esquisse : dans ce cas, il faut ca
 
 - Ou stocker les esquisses ?
 - Quel statut utiliser dans le JSON : `draft`, `sketch`, `canonical` ?
-- Comment promouvoir une esquisse en composant sans casser les pages ?
+- Comment promouvoir une esquisse en composant sans casser les pages ? Reponse de workflow : passer par `/open-ui-consolidate-sketch`, cartographier les usages proches, choisir composant/variante/page/token/pattern, puis appliquer impact + RGAA + validations.
 - Faut-il inclure les esquisses dans `npm run list` ?
 - Comment eviter que les esquisses deviennent un cimetiere de composants morts ?
+
+## Promotion vers production
+
+Une esquisse retenue ne devient pas production par deplacement de fichier. Elle doit etre traduite en contrat durable.
+
+Workflow recommande :
+
+1. Identifier la source retenue : fichier, capture, direction ou retour utilisateur.
+2. Relire la section "A consolider si on garde cette direction".
+3. Extraire ce qui doit survivre : intention utilisateur, hierarchie, composition, interaction, langage visuel.
+4. Jeter ce qui etait experimental : donnees factices, styles locaux, libelles temporaires, raccourcis CSS.
+5. Cartographier les composants, variantes, tokens et pages proches.
+6. Choisir le niveau de production : composant canonique, variante, composition, page locale, token ou pattern documente.
+7. Implementer proprement dans le design system, avec docs et exemples credibles.
+8. Verifier impact, RGAA, validations et rendu navigateur.

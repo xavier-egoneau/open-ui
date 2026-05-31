@@ -22,6 +22,7 @@ Ce skill sert a explorer avant de stabiliser. Il aide l'agent a produire des dir
 - `open-ui` orchestre le workflow projet, l'impact et l'isolation des esquisses.
 - `design-sketching` aide seulement la divergence creative et le langage visuel.
 - `design-critique` prend le relais pour choisir, diagnostiquer ou corriger une direction.
+- `sketch-to-production` prend le relais quand une direction retenue doit devenir composant, variante, page, token ou pattern canonique.
 - `design-memory` prend le relais apres decision ou retour utilisateur pour mettre a jour `MEMORY.md`.
 
 ## Brief minimal
@@ -100,4 +101,6 @@ Par defaut, eviter :
 - Pour les principes generiques : lire `references/sketch-principles.md`.
 - Pour choisir des axes creatifs : lire `references/visual-directions.md`.
 - Pour le craft visuel de base (espacement, typo, couleur, surfaces, signaux contemporains) : lire `references/design-craft.md`. Ce fichier est obligatoire pour tout sketch — il encode ce qu'un designer senior applique par défaut.
+- Pour consolider une direction retenue en production : utiliser `sketch-to-production`.
 - Pour transformer une direction retenue en regles projet : utiliser `design-memory`.
+
