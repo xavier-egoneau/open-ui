@@ -7,6 +7,8 @@ description: Skill local de creation UI en phase amont pour Open UI. A utiliser 
 
 Ce skill sert a explorer avant de stabiliser. Il aide l'agent a produire des directions UI creatives sans tomber dans le rendu IA generique, tout en gardant assez de structure pour que les idees puissent ensuite devenir un design system.
 
+Quand le livrable est une maquette HTML/CSS/JS autonome, l'ecrire dans `public/sketches/<slug>/`. Ne jamais creer un nouveau sketch HTML directement consultable dans `dev/sketches/` : `dev/` est reserve au design system canonique, aux composants source et aux assets de build.
+
 ## Posture
 
 - Explorer largement avant de converger.
@@ -82,6 +84,8 @@ Pour chaque direction :
 
 Quand du code ou une maquette est produit, marquer le statut comme experimental et l'isoler du design system canonique.
 
+Pour une maquette HTML autonome, l'isolation canonique est `public/sketches/<slug>/` avec fichiers ouvrables (`index.html`, `style.css`, JS local si besoin).
+
 ## Anti-generique
 
 Par defaut, eviter :
@@ -103,4 +107,3 @@ Par defaut, eviter :
 - Pour le craft visuel de base (espacement, typo, couleur, surfaces, signaux contemporains) : lire `references/design-craft.md`. Ce fichier est obligatoire pour tout sketch — il encode ce qu'un designer senior applique par défaut.
 - Pour consolider une direction retenue en production : utiliser `sketch-to-production`.
 - Pour transformer une direction retenue en regles projet : utiliser `design-memory`.
-

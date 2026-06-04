@@ -19,7 +19,7 @@ Produire une esquisse utile pour explorer une direction, pas un composant canoni
 2. Charger `design-sketching` si la demande implique de la divergence créative ou plusieurs directions.
 3. Annoncer que le travail est une esquisse hors DS canonique.
 4. Ne pas modifier un composant canonique, un token global ou une convention partagée sans confirmation explicite.
-5. Placer ou nommer l'esquisse de façon à signaler son statut brouillon/exploratoire.
+5. Placer les fichiers HTML/CSS/JS autonomes dans `public/sketches/<slug>/`, jamais dans `dev/sketches/`.
 6. Réutiliser les tokens/patterns existants quand ça aide, mais ne pas brider l'exploration au point de tuer la recherche visuelle.
 7. Vérifier visuellement au navigateur si une UI est produite.
 8. Terminer par une section : `À consolider si on garde cette direction`.
@@ -37,3 +37,4 @@ Produire une esquisse utile pour explorer une direction, pas un composant canoni
 - Ne pas utiliser cette commande pour une modification normale de page/composant.
 - Ne pas transformer automatiquement l'esquisse en composant stable.
 - Ne pas laisser l'esquisse polluer la liste canonique du design system sans décision utilisateur.
+- Ne pas creer de nouveau sketch HTML autonome dans `dev/sketches/`.

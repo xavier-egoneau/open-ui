@@ -69,6 +69,7 @@ Déclencheurs acceptés : prompt `/open-ui-sketch` ou demande explicite du type 
 Dans ce mode :
 
 - charger le skill `design-sketching` si l'objectif est de chercher plusieurs directions créatives ;
+- produire les maquettes HTML/CSS/JS autonomes dans `public/sketches/<slug>/`, pas dans `dev/sketches/` ;
 - produire une esquisse utile et visuelle, mais clairement marquée comme brouillon exploratoire ;
 - ne pas modifier un composant canonique, un token global ou une convention partagée sans confirmation explicite ;
 - ne pas référencer l'esquisse comme composant stable ;
@@ -76,6 +77,8 @@ Dans ce mode :
 - documenter ce qu'il faudrait consolider ensuite : composants à extraire, tokens à créer, variantes à stabiliser, impacts à analyser, points RGAA à reprendre.
 
 Sortie attendue du mode sketch : une proposition visualisable + une section "À consolider si on garde cette direction".
+
+Pour les sketches HTML directement ouvrables, l'emplacement attendu est `public/sketches/<slug>/`. Ne pas creer de nouveau dossier `dev/sketches/` pour ce cas.
 
 ### Mode consolidation — prompt `/open-ui-consolidate-sketch`
 
