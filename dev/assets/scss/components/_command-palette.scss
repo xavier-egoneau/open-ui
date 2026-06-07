@@ -1,0 +1,191 @@
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+.command-palette {
+  width: min(100%, 42rem);
+  overflow: hidden;
+  color: $color-gray-900;
+  background-color: $color-white;
+  border: 1px solid $color-gray-200;
+  border-radius: $radius-2xl;
+  box-shadow: $shadow-xl;
+
+  &__header,
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-md;
+    padding: $spacing-lg $spacing-xl;
+  }
+
+  &__header {
+    align-items: flex-start;
+    border-bottom: 1px solid $color-gray-200;
+  }
+
+  &__footer {
+    color: $color-gray-500;
+    font-size: $font-size-sm;
+    border-top: 1px solid $color-gray-200;
+  }
+
+  &__heading {
+    display: grid;
+    gap: $spacing-xs;
+  }
+
+  &__eyebrow,
+  &__title,
+  &__subtitle,
+  &__group-title,
+  &__empty-title,
+  &__empty-text {
+    margin: 0;
+  }
+
+  &__eyebrow {
+    color: $color-primary;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-tight;
+  }
+
+  &__subtitle {
+    color: $color-gray-600;
+    font-size: $font-size-sm;
+  }
+
+  &__escape,
+  &__shortcut kbd {
+    display: inline-flex;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0 $spacing-xs;
+    color: $color-gray-600;
+    background-color: $color-gray-50;
+    border: 1px solid $color-gray-200;
+    border-radius: $radius-md;
+    font-family: $font-family-mono;
+    font-size: $font-size-xs;
+  }
+
+  &__search {
+    display: grid;
+    gap: $spacing-xs;
+    padding: $spacing-lg $spacing-xl;
+    border-bottom: 1px solid $color-gray-200;
+  }
+
+  &__label {
+    color: $color-gray-700;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+
+  &__input {
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    color: $color-gray-900;
+    background-color: $color-gray-50;
+    border: 1px solid $color-gray-200;
+    border-radius: $radius-lg;
+    font: inherit;
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  &__body {
+    max-height: 24rem;
+    overflow: auto;
+    padding: $spacing-md;
+  }
+
+  &__groups,
+  &__group,
+  &__items {
+    display: grid;
+    gap: $spacing-sm;
+  }
+
+  &__group + &__group {
+    padding-top: $spacing-sm;
+  }
+
+  &__group-title {
+    padding: 0 $spacing-sm;
+    color: $color-gray-500;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+    width: 100%;
+    padding: $spacing-sm;
+    color: $color-gray-800;
+    text-align: left;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: $radius-lg;
+    cursor: pointer;
+
+    &:hover,
+    &--active {
+      background-color: $color-gray-50;
+      border-color: $color-gray-200;
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  &__item-content {
+    display: grid;
+    gap: $spacing-xs;
+    min-width: 0;
+  }
+
+  &__item-label {
+    font-weight: $font-weight-semibold;
+  }
+
+  &__item-description {
+    color: $color-gray-600;
+    font-size: $font-size-sm;
+  }
+
+  &__shortcut {
+    display: inline-flex;
+    gap: $spacing-xs;
+  }
+
+  &__empty {
+    display: grid;
+    gap: $spacing-xs;
+    padding: $spacing-xl;
+    color: $color-gray-600;
+    text-align: center;
+  }
+
+  &__empty-title {
+    color: $color-gray-900;
+    font-weight: $font-weight-semibold;
+  }
+}

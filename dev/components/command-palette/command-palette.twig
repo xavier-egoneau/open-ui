@@ -1,0 +1,105 @@
+{% set id = id|default('command-palette') %}
+{% set title = title|default('Palette de commande') %}
+{% set subtitle = subtitle|default('Rechercher une action, une page ou un patient') %}
+{% set searchPlaceholder = searchPlaceholder|default('Tapez une commande ou un raccourci…') %}
+{% set activeValue = activeValue|default('open-patient') %}
+{% set showEmpty = showEmpty|default(false) %}
+{% set emptyTitle = emptyTitle|default('Aucune commande trouvée') %}
+{% set emptyText = emptyText|default('Essayez un autre mot-clé ou vérifiez l’orthographe.') %}
+{% set helpText = helpText|default('Entrée pour sélectionner · flèches pour naviguer · Échap pour fermer') %}
+
+{% set groups = groups|default([
+  {
+    title: 'Actions rapides',
+    commands: [
+      { value: 'open-patient', label: 'Ouvrir un dossier patient', description: 'Accéder directement à la fiche patient', shortcut: ['⌘', 'K'] },
+      { value: 'new-note', label: 'Créer une note', description: 'Ajouter une note clinique au dossier courant', shortcut: ['N'] }
+    ]
+  },
+  {
+    title: 'Navigation',
+    commands: [
+      { value: 'dashboard', label: 'Aller au tableau de bord', description: 'Voir les indicateurs et tâches prioritaires', shortcut: ['G', 'D'] },
+      { value: 'patients', label: 'Liste des patients', description: 'Consulter et filtrer les patients', shortcut: ['G', 'P'] }
+    ]
+  }
+]) %}
+
+<section
+  class="command-palette"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="{{ id }}-title"
+  aria-describedby="{{ id }}-subtitle"
+  data-gf-component="command-palette"
+>
+  <header class="command-palette__header">
+    <div class="command-palette__heading">
+      <p class="command-palette__eyebrow">Commande globale</p>
+      <h2 class="command-palette__title" id="{{ id }}-title">{{ title }}</h2>
+      <p class="command-palette__subtitle" id="{{ id }}-subtitle">{{ subtitle }}</p>
+    </div>
+    <kbd class="command-palette__escape">Esc</kbd>
+  </header>
+
+  <div class="command-palette__search">
+    <label class="command-palette__label" for="{{ id }}-search">Rechercher une commande</label>
+    <input
+      class="command-palette__input"
+      id="{{ id }}-search"
+      type="search"
+      placeholder="{{ searchPlaceholder }}"
+      autocomplete="off"
+      aria-controls="{{ id }}-listbox"
+      data-gf-command-palette-search
+    >
+  </div>
+
+  <div class="command-palette__body">
+    {% if showEmpty %}
+      <div class="command-palette__empty" role="status">
+        <p class="command-palette__empty-title">{{ emptyTitle }}</p>
+        <p class="command-palette__empty-text">{{ emptyText }}</p>
+      </div>
+    {% else %}
+      <div class="command-palette__groups" id="{{ id }}-listbox" role="listbox" aria-label="Commandes disponibles">
+        {% for group in groups %}
+          <section class="command-palette__group" aria-labelledby="{{ id }}-group-{{ loop.index }}">
+            <h3 class="command-palette__group-title" id="{{ id }}-group-{{ loop.index }}">{{ group.title }}</h3>
+            <div class="command-palette__items">
+              {% for command in group.commands %}
+                {% set isActive = command.value == activeValue %}
+                <button
+                  class="command-palette__item{% if isActive %} command-palette__item--active{% endif %}"
+                  type="button"
+                  role="option"
+                  aria-selected="{{ isActive ? 'true' : 'false' }}"
+                  value="{{ command.value }}"
+                  data-gf-command-palette-item
+                >
+                  <span class="command-palette__item-content">
+                    <span class="command-palette__item-label">{{ command.label }}</span>
+                    {% if command.description %}
+                      <span class="command-palette__item-description">{{ command.description }}</span>
+                    {% endif %}
+                  </span>
+                  {% if command.shortcut %}
+                    <span class="command-palette__shortcut" aria-label="Raccourci clavier">
+                      {% for key in command.shortcut %}
+                        <kbd>{{ key }}</kbd>
+                      {% endfor %}
+                    </span>
+                  {% endif %}
+                </button>
+              {% endfor %}
+            </div>
+          </section>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <footer class="command-palette__footer">
+    <span>{{ helpText }}</span>
+  </footer>
+</section>

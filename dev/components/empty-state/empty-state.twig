@@ -1,0 +1,38 @@
+{% set id = id|default('empty-state') %}
+{% set variant = variant|default('default') %}
+{% set title = title|default('Aucun élément à afficher') %}
+{% set description = description|default('Les informations apparaîtront ici dès qu’elles seront disponibles.') %}
+{% set icon = icon|default('') %}
+{% set primaryActionLabel = primaryActionLabel|default('Créer un élément') %}
+{% set primaryActionHref = primaryActionHref|default('#') %}
+{% set secondaryActionLabel = secondaryActionLabel|default('Réinitialiser') %}
+{% set secondaryActionHref = secondaryActionHref|default('') %}
+
+{% set icons = {
+  default: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 10h8"/><path d="M8 14h5"/></svg>',
+  error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
+  filtered: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/><path d="M6 21l12-12"/></svg>',
+  onboarding: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
+} %}
+
+<section class="empty-state empty-state--{{ variant }}" aria-labelledby="{{ id }}-title" data-gf-component="empty-state">
+  <div class="empty-state__icon" aria-hidden="true">
+    {{ icon ? icon|raw : icons[variant]|default(icons.default)|raw }}
+  </div>
+
+  <div class="empty-state__content">
+    <h2 class="empty-state__title" id="{{ id }}-title">{{ title }}</h2>
+    {% if description %}
+      <p class="empty-state__description">{{ description }}</p>
+    {% endif %}
+  </div>
+
+  <div class="empty-state__actions">
+    {% if primaryActionLabel %}
+      <a class="btn btn--primary btn--sm" href="{{ primaryActionHref }}">{{ primaryActionLabel }}</a>
+    {% endif %}
+    {% if secondaryActionLabel and secondaryActionHref %}
+      <a class="btn btn--ghost btn--sm" href="{{ secondaryActionHref }}">{{ secondaryActionLabel }}</a>
+    {% endif %}
+  </div>
+</section>

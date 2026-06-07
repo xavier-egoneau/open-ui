@@ -1,0 +1,81 @@
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: $spacing-md;
+  padding: $spacing-2xl;
+  color: $color-gray-700;
+  text-align: center;
+  background-color: $color-gray-50;
+  border: 1px solid $color-gray-200;
+  border-radius: $radius-xl;
+
+  &__icon {
+    display: inline-flex;
+    width: 3rem;
+    height: 3rem;
+    align-items: center;
+    justify-content: center;
+    color: $color-primary;
+    background-color: rgba($color-primary-light, 0.16);
+    border-radius: $radius-full;
+
+    svg {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
+
+  &__content {
+    display: grid;
+    gap: $spacing-xs;
+    max-width: 34rem;
+  }
+
+  &__title {
+    margin: 0;
+    color: $color-gray-900;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-tight;
+  }
+
+  &__description {
+    margin: 0;
+    color: $color-gray-600;
+    font-size: $font-size-base;
+    line-height: $line-height-normal;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: $spacing-sm;
+  }
+
+  &--error {
+    border-color: rgba($color-danger, 0.32);
+
+    .empty-state__icon {
+      color: $color-danger;
+      background-color: rgba($color-danger-light, 0.18);
+    }
+  }
+
+  &--filtered {
+    border-style: dashed;
+
+    .empty-state__icon {
+      color: $color-secondary;
+      background-color: rgba($color-secondary-light, 0.18);
+    }
+  }
+
+  &--onboarding {
+    background-color: rgba($color-primary-light, 0.08);
+    border-color: rgba($color-primary, 0.24);
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "name": "Command Palette",
+  "level": "molecule",
+  "category": "Navigation",
+  "description": "Palette de commande type Linear/Raycast avec recherche, groupes, raccourcis visibles, item actif, état vide et footer d’aide.",
+  "variants": {
+    "showEmpty": {
+      "label": "État vide",
+      "type": "checkbox",
+      "default": false
+    }
+  },
+  "content": {
+    "title": {
+      "label": "Titre",
+      "type": "text",
+      "default": "Palette de commande"
+    },
+    "subtitle": {
+      "label": "Sous-titre",
+      "type": "text",
+      "default": "Rechercher une action, une page ou un patient"
+    },
+    "searchPlaceholder": {
+      "label": "Placeholder de recherche",
+      "type": "text",
+      "default": "Tapez une commande ou un raccourci…"
+    },
+    "activeValue": {
+      "label": "Commande active",
+      "type": "text",
+      "default": "open-patient"
+    },
+    "emptyTitle": {
+      "label": "Titre état vide",
+      "type": "text",
+      "default": "Aucune commande trouvée"
+    },
+    "emptyText": {
+      "label": "Texte état vide",
+      "type": "text",
+      "default": "Essayez un autre mot-clé ou vérifiez l’orthographe."
+    },
+    "groups": {
+      "label": "Groupes de commandes",
+      "type": "array",
+      "default": [
+        {
+          "title": "Actions rapides",
+          "commands": [
+            {
+              "value": "open-patient",
+              "label": "Ouvrir un dossier patient",
+              "description": "Accéder directement à la fiche patient",
+              "icon": "search",
+              "shortcut": ["⌘", "K"]
+            },
+            {
+              "value": "new-note",
+              "label": "Créer une note",
+              "description": "Ajouter une note clinique au dossier courant",
+              "icon": "edit",
+              "shortcut": ["N"]
+            }
+          ]
+        },
+        {
+          "title": "Navigation",
+          "commands": [
+            {
+              "value": "dashboard",
+              "label": "Aller au tableau de bord",
+              "description": "Voir les indicateurs et tâches prioritaires",
+              "icon": "dashboard",
+              "shortcut": ["G", "D"]
+            },
+            {
+              "value": "patients",
+              "label": "Liste des patients",
+              "description": "Consulter et filtrer les patients",
+              "icon": "users",
+              "shortcut": ["G", "P"]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

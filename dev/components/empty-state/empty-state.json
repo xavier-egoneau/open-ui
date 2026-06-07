@@ -1,0 +1,51 @@
+{
+  "name": "Empty State",
+  "level": "molecule",
+  "category": "Feedback",
+  "description": "État vide pour listes, résultats filtrés, erreurs légères et premiers pas.",
+  "variants": {
+    "variant": {
+      "label": "Variante",
+      "type": "select",
+      "default": "default",
+      "options": ["default", "error", "filtered", "onboarding"]
+    }
+  },
+  "content": {
+    "id": {
+      "label": "Identifiant",
+      "type": "text",
+      "default": "empty-state-demo"
+    },
+    "title": {
+      "label": "Titre",
+      "type": "text",
+      "default": "Aucun élément à afficher"
+    },
+    "description": {
+      "label": "Description",
+      "type": "text",
+      "default": "Les informations apparaîtront ici dès qu’elles seront disponibles."
+    },
+    "primaryActionLabel": {
+      "label": "Action principale",
+      "type": "text",
+      "default": "Créer un élément"
+    },
+    "primaryActionHref": {
+      "label": "Lien action principale",
+      "type": "text",
+      "default": "#"
+    },
+    "secondaryActionLabel": {
+      "label": "Action secondaire",
+      "type": "text",
+      "default": "Réinitialiser"
+    },
+    "secondaryActionHref": {
+      "label": "Lien action secondaire",
+      "type": "text",
+      "default": ""
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "name": "Drawer",
+  "level": "molecule",
+  "category": "Overlay",
+  "description": "Panneau latéral ou bas avec overlay, en-tête, contenu scrollable, footer et bouton de fermeture.",
+  "variants": {
+    "position": {
+      "label": "Position",
+      "type": "select",
+      "default": "right",
+      "options": ["right", "left", "bottom"]
+    },
+    "overlay": {
+      "label": "Afficher l’overlay",
+      "type": "checkbox",
+      "default": true
+    },
+    "open": {
+      "label": "Ouvert",
+      "type": "checkbox",
+      "default": true
+    },
+    "showClose": {
+      "label": "Afficher le bouton fermer",
+      "type": "checkbox",
+      "default": true
+    }
+  },
+  "content": {
+    "id": {
+      "label": "Identifiant",
+      "type": "text",
+      "default": "drawer-demo"
+    },
+    "title": {
+      "label": "Titre",
+      "type": "text",
+      "default": "Détails"
+    },
+    "description": {
+      "label": "Description optionnelle",
+      "type": "text",
+      "default": "Consultez ou modifiez les informations associées."
+    },
+    "body": {
+      "label": "Contenu",
+      "type": "text",
+      "default": "<p>Contenu du panneau. Cette zone devient scrollable lorsque le contenu dépasse la hauteur disponible.</p>"
+    },
+    "footer": {
+      "label": "Footer optionnel",
+      "type": "text",
+      "default": "<button class=\"btn btn--ghost\" type=\"button\">Annuler</button><button class=\"btn btn--primary\" type=\"button\">Valider</button>"
+    },
+    "closeLabel": {
+      "label": "Libellé du bouton fermer",
+      "type": "text",
+      "default": "Fermer le panneau"
+    }
+  }
+}
