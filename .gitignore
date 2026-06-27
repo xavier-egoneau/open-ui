@@ -5,3 +5,10 @@ dist/
 .env
 .env.*
 !.env.example
+.pi/
+.claude
+.claude/
+.idea
+.idea/
+.profile
+mcp.json

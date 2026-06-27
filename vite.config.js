@@ -48,20 +48,40 @@ function serveFile(filePath, res) {
 
 function openUIPlugin() {
   let fullReloadTimer
+  const tempHtmlFiles = new Set()
+
+  function assertTempHtmlWritable(filePath) {
+    if (!fs.existsSync(filePath)) return
+    if (!tempHtmlFiles.has(filePath)) {
+      throw new Error(`Refusing to overwrite existing root HTML file at ${filePath}`)
+    }
+  }
+
+  function cleanBuildCache() {
+    for (const file of tempHtmlFiles) {
+      if (fs.existsSync(file)) fs.unlinkSync(file)
+    }
+    tempHtmlFiles.clear()
+  }
 
   return {
     name: 'openui',
 
-    // Build : rend chaque page Twig → HTML temporaire, passé à Rollup comme entrée
+    // Build : rend chaque page Twig → HTML temporaire racine, passé à Rollup comme entrée.
+    // Vite émet les pages HTML selon leur chemin relatif au root; les fichiers temporaires
+    // restent donc à la racine le temps du build mais ne sont jamais écrasés s'ils existent déjà.
     async config(cfg, { command }) {
       if (command !== 'build') return
-      const pages = fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.twig'))
+      cleanBuildCache()
+      const pages = fs.existsSync(PAGES_DIR) ? fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.twig')) : []
       const inputs = {}
       for (const file of pages) {
         const slug = file.replace('.twig', '')
         const html = await renderTwig(path.join(PAGES_DIR, file), {})
         const tmpPath = path.join(ROOT, `${slug}.html`)
+        assertTempHtmlWritable(tmpPath)
         fs.writeFileSync(tmpPath, html, 'utf8')
+        tempHtmlFiles.add(tmpPath)
         inputs[slug] = tmpPath
       }
       cfg.build ??= {}
@@ -69,15 +89,13 @@ function openUIPlugin() {
       cfg.build.rollupOptions.input = inputs
     },
 
-    // Build : nettoie les HTML temporaires puis publie les esquisses séparément
+    buildEnd() {
+      cleanBuildCache()
+    },
+
+    // Build : publie les esquisses séparément
     closeBundle() {
-      const pages = fs.existsSync(PAGES_DIR)
-        ? fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.twig'))
-        : []
-      for (const file of pages) {
-        const tmpPath = path.join(ROOT, file.replace('.twig', '.html'))
-        if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath)
-      }
+      cleanBuildCache()
       copySketchesToPublic()
     },
 

@@ -23,14 +23,14 @@
 @use 'components/card';
 @use 'components/patient-row';
 @use 'components/footer';
-
-// Pages
-@use 'components/listing-page';
-@use 'components/form-page';
-@use 'components/patients-page';
 @use 'components/alert';
 @use 'components/dropdown';
 @use 'components/select-custom';
+
+// Pages
+@use 'pages/listing-page';
+@use 'pages/form-page';
+@use 'pages/patients-page';
 
 // Theme overrides
 @use 'base/theme';

@@ -8,6 +8,7 @@ const pages = getPageEntries()
 const componentIds = new Set(components.map((component) => component.id))
 const allowedControlTypes = new Set(['select', 'checkbox', 'text', 'color', 'number', 'array', 'component-params'])
 const allowedLevels = new Set(['atom', 'molecule', 'organism', 'template'])
+const allowedStatuses = new Set(['canonical', 'draft', 'sketch'])
 
 function fail(file, message) {
   errors.push(`${file}: ${message}`)
@@ -15,6 +16,25 @@ function fail(file, message) {
 
 function warn(file, message) {
   warnings.push(`${file}: ${message}`)
+}
+
+function validateStatus(file, schema, scope) {
+  if (!schema.status) {
+    if (scope === 'component') warn(file, 'missing status, treated as canonical for compatibility')
+    return
+  }
+
+  if (!allowedStatuses.has(schema.status)) fail(file, `unsupported status "${schema.status}"`)
+  if (scope === 'component' && schema.status === 'sketch') fail(file, 'status "sketch" is not allowed in dev/components')
+  if (scope === 'page' && schema.status === 'sketch') fail(file, 'status "sketch" is not allowed in dev/pages')
+}
+
+function validatePlainObject(file, groupName, value) {
+  if (value !== undefined && (!value || typeof value !== 'object' || Array.isArray(value))) {
+    fail(file, `${groupName} must be an object`)
+    return false
+  }
+  return true
 }
 
 function validateControls(file, groupName, controls = {}) {
@@ -28,8 +48,8 @@ function validateControls(file, groupName, controls = {}) {
     if (control.type && !allowedControlTypes.has(control.type)) {
       fail(file, `${groupName}.${key} has unsupported type "${control.type}"`)
     }
-    if (control.type === 'select' && !Array.isArray(control.options)) {
-      fail(file, `${groupName}.${key} select control must define options[]`)
+    if (control.type === 'select' && (!Array.isArray(control.options) || control.options.length === 0)) {
+      fail(file, `${groupName}.${key} select control must define non-empty options[]`)
     }
     if (!Object.hasOwn(control, 'default')) warn(file, `${groupName}.${key} has no default`)
   }
@@ -44,6 +64,10 @@ for (const component of components) {
   if (schema.level && !allowedLevels.has(schema.level)) fail(file, `unsupported level "${schema.level}"`)
   if (!schema.category) fail(file, 'missing category')
   if (!schema.description) fail(file, 'missing description')
+  validateStatus(file, schema, 'component')
+  for (const groupName of ['variants', 'content', 'parts', 'collections', 'families', 'instances', 'layoutGroups']) {
+    validatePlainObject(file, groupName, schema[groupName])
+  }
   if (!fs.existsSync(component.twigPath)) fail(file, `missing twig file ${component.twigPath}`)
   if (!fs.existsSync(component.scssPath)) warn(file, `missing component scss ${component.scssPath}`)
   if (!fs.existsSync(component.mdPath)) warn(file, `missing component documentation ${component.mdPath}`)
@@ -63,6 +87,10 @@ for (const page of pages) {
   if (!schema.name) fail(file, 'missing name')
   if (!schema.category) warn(file, 'missing category')
   if (!schema.description) warn(file, 'missing description')
+  validateStatus(file, schema, 'page')
+  for (const groupName of ['variants', 'content', 'parts', 'collections', 'families', 'instances', 'layoutGroups']) {
+    validatePlainObject(file, groupName, schema[groupName])
+  }
   if (!fs.existsSync(page.twigPath)) fail(file, `missing twig file ${page.twigPath}`)
 
   validateControls(file, 'variants', schema.variants ?? {})

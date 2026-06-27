@@ -10,6 +10,7 @@
     "icons": "node scripts/generate-icons.js",
     "list": "node scripts/list-components.js",
     "validate": "node scripts/validate-json.js",
+    "health": "node scripts/health.js",
     "lint:scss": "stylelint \"dev/assets/scss/**/*.scss\"",
     "test:a11y": "node scripts/test-a11y.js",
     "test": "vitest run",

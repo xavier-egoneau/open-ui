@@ -10,12 +10,13 @@ Pour toute demande utilisateur, l'agent suit cette sequence :
 
 1. Comprendre l'intention produit, pas seulement les mots.
 2. Cartographier les composants/pages/tokens concernes.
-3. Chercher une reutilisation ou une variante existante avant de creer.
-4. Choisir le niveau de modification : page, instance, composant, token ou convention.
-5. Annoncer les impacts si le changement est transversal.
-6. Modifier peu de fichiers, mais les bons.
-7. Verifier avec les scripts disponibles.
-8. Rendre un bilan clair : changement, impact, verification, risques.
+3. Identifier le statut des artefacts manipules : `canonical`, `draft` ou `sketch`.
+4. Chercher une reutilisation ou une variante existante avant de creer.
+5. Choisir le niveau de modification : page, instance, composant, token ou convention.
+6. Annoncer les impacts si le changement est transversal.
+7. Modifier peu de fichiers, mais les bons.
+8. Verifier avec les scripts disponibles.
+9. Rendre un bilan clair : changement, impact, verification, risques.
 
 ## Regles fortes
 
@@ -24,6 +25,7 @@ Pour toute demande utilisateur, l'agent suit cette sequence :
 - Ne pas modifier un token sans annoncer l'impact transversal probable.
 - Ne pas casser le design system pour satisfaire un cas local.
 - Ne pas confondre maquette/esquisse et composant canonique.
+- Ne pas ranger un style de page dans `dev/assets/scss/components/` : utiliser `dev/assets/scss/pages/` pour les pages et `layout/` pour les primitives transverses.
 
 ## Creation
 
@@ -37,6 +39,7 @@ Un composant canonique doit avoir JSON, Twig, Markdown et SCSS si necessaire. Un
 ## Verifications minimales
 
 - `npm run validate`
+- `npm run health` si la structure du workspace, les docs ou les imports changent
 - `npm run list` si la cartographie doit etre relue
 - `npm run impact <component>` si un composant est touche
 - `npm run lint:scss` si SCSS touche
