@@ -55,13 +55,49 @@ function escapeHtml(value) {
 
 function renderWorkspaceIndex(pages, sketches) {
   const pageContent = pages.length
-    ? `<ul>${pages.map(slug => `<li><a href="/${encodeURIComponent(slug)}.html">${escapeHtml(slug)}</a></li>`).join('\n')}</ul>`
+    ? `<ul>${pages.map(slug => `<li><a href="./${encodeURIComponent(slug)}.html">${escapeHtml(slug)}</a></li>`).join('\n')}</ul>`
     : '<p>Aucune page source.</p>'
   const sketchContent = sketches.length
-    ? `<ul>${sketches.map(slug => `<li><a href="/sketches/${encodeURIComponent(slug)}/">${escapeHtml(slug)}</a> <small>sketch</small></li>`).join('\n')}</ul>`
+    ? `<ul>${sketches.map(slug => `<li><a href="./sketches/${encodeURIComponent(slug)}/">${escapeHtml(slug)}</a> <small>sketch</small></li>`).join('\n')}</ul>`
     : '<p>Aucune esquisse source.</p>'
 
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Open UI</title></head><body><main><h1>Open UI</h1><section aria-labelledby="pages-title"><h2 id="pages-title">Pages</h2>${pageContent}</section><section aria-labelledby="sketches-title"><h2 id="sketches-title">Sketches</h2>${sketchContent}</section></main></body></html>`
+}
+
+function inlineBuiltStylesheets() {
+  if (!fs.existsSync(OUT_DIR)) return
+
+  const htmlFiles = [
+    path.join(OUT_DIR, 'index.html'),
+    ...listPageSlugs().map(slug => path.join(OUT_DIR, `${slug}.html`))
+  ]
+
+  for (const htmlPath of htmlFiles) {
+    if (!fs.existsSync(htmlPath)) continue
+
+    const html = fs.readFileSync(htmlPath, 'utf8')
+    const inlined = html.replace(/<link\b[^>]*>/gi, (linkTag) => {
+      if (!/\brel=["']stylesheet["']/i.test(linkTag)) return linkTag
+
+      const hrefMatch = linkTag.match(/\bhref=["']([^"']+)["']/i)
+      if (!hrefMatch) return linkTag
+
+      const href = hrefMatch[1]
+      if (/^(?:[a-z]+:|\/\/)/i.test(href)) return linkTag
+
+      const pathname = decodeURIComponent(href.split(/[?#]/, 1)[0])
+      const stylesheetPath = path.resolve(path.dirname(htmlPath), pathname)
+      const relativeToOutput = path.relative(OUT_DIR, stylesheetPath)
+
+      if (relativeToOutput.startsWith('..') || path.isAbsolute(relativeToOutput)) return linkTag
+      if (!fs.existsSync(stylesheetPath)) return linkTag
+
+      const css = fs.readFileSync(stylesheetPath, 'utf8').replaceAll('</style', '<\\/style')
+      return `<style data-openui-source="${escapeHtml(href)}">\n${css}\n</style>`
+    })
+
+    fs.writeFileSync(htmlPath, inlined, 'utf8')
+  }
 }
 
 function serveFile(filePath, res) {
@@ -122,6 +158,7 @@ function openUIPlugin() {
     // Build : nettoie les HTML temporaires puis publie les esquisses séparément
     closeBundle() {
       cleanupTemporaryHtml()
+      inlineBuiltStylesheets()
       copySketchesToPublic()
     },
 
@@ -184,6 +221,8 @@ function openUIPlugin() {
 }
 
 export default defineConfig({
+  // Le rendu public doit rester portable, y compris ouvert directement en file://.
+  base: './',
   plugins: [openUIPlugin()],
   server: {
     port: 3000,

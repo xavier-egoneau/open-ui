@@ -6,6 +6,7 @@ Open UI est un workspace de design system agent-first. Le modele composant doit 
 
 ## Contrat
 
+- `dev/` est la racine structurelle des sources du workspace. Le dépôt conserve uniquement `dev/.gitkeep` ; son contenu projet reste local et ignoré par Git.
 - Un composant canonique vit dans `dev/components/[name]/`.
 - Chaque composant a trois fichiers obligatoires : `[name].json`, `[name].twig`, `[name].md`.
 - Le JSON est la source de verite des metadonnees, controles, relations et defaults exposables.

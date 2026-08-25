@@ -1,7 +1,8 @@
 node_modules/
 public/
 dist/
-dev/
+dev/*
+!dev/.gitkeep
 .DS_Store
 .env
 .env.*
