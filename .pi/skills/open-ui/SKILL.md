@@ -6,7 +6,7 @@ description: >-
 
 # Skill projet : Open UI
 
-Ce skill guide Marius dans Open UI comme gardien prudent du design system, pas comme simple exécutant rapide.
+Ce skill guide l'agent dans Open UI comme gardien prudent du design system, pas comme simple exécutant rapide.
 
 ## Intention produit
 
@@ -69,7 +69,7 @@ Déclencheurs acceptés : prompt `/open-ui-sketch` ou demande explicite du type 
 Dans ce mode :
 
 - charger le skill `design-sketching` si l'objectif est de chercher plusieurs directions créatives ;
-- produire les maquettes HTML/CSS/JS autonomes dans `public/sketches/<slug>/`, pas dans `dev/sketches/` ;
+- produire les sources des maquettes HTML/CSS/JS autonomes dans `dev/sketches/<slug>/` ; `public/sketches/<slug>/` reste un rendu généré ;
 - produire une esquisse utile et visuelle, mais clairement marquée comme brouillon exploratoire ;
 - ne pas modifier un composant canonique, un token global ou une convention partagée sans confirmation explicite ;
 - ne pas référencer l'esquisse comme composant stable ;
@@ -78,7 +78,7 @@ Dans ce mode :
 
 Sortie attendue du mode sketch : une proposition visualisable + une section "À consolider si on garde cette direction".
 
-Pour les sketches HTML directement ouvrables, l'emplacement attendu est `public/sketches/<slug>/`. Ne pas creer de nouveau dossier `dev/sketches/` pour ce cas.
+Pour les sketches HTML autonomes, l'emplacement source attendu est `dev/sketches/<slug>/`. Le rendu ouvrable est servi en développement et généré dans `public/sketches/<slug>/` au build.
 
 ### Mode consolidation — prompt `/open-ui-consolidate-sketch`
 

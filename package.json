@@ -10,9 +10,9 @@
     "icons": "node scripts/generate-icons.js",
     "list": "node scripts/list-components.js",
     "validate": "node scripts/validate-json.js",
-    "lint:scss": "stylelint \"dev/assets/scss/**/*.scss\"",
+    "lint:scss": "stylelint \"dev/assets/scss/**/*.scss\" --allow-empty-input",
     "test:a11y": "node scripts/test-a11y.js",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "impact": "node scripts/impact.js",
     "clean": "node scripts/clean-build.js"

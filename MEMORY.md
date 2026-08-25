@@ -9,7 +9,7 @@ Ne pas créer un deuxième fichier de direction design sans demande explicite. P
 - **Direction stabilisée** : règles et décisions à appliquer au futur travail.
 - **Entrées de provenance** : retours concrets, exemples fondateurs et vigilances qui expliquent d'où viennent les règles.
 
-Les skills dans `.marius/skills/` gardent uniquement les règles de comportement réutilisables par l'agent.
+Les skills locaux gardent uniquement les règles de comportement réutilisables par l'agent ; leur format d'installation peut varier selon la plateforme.
 
 Après une demande réalisée puis critiquée par l'utilisateur :
 
@@ -40,6 +40,7 @@ Open UI explore un framework agentique de design/dev UI : l'agent peut concevoir
 - Design system protected : les composants, tokens et conventions partagés restent protégés par défaut.
 - Critique loop : les retours utilisateur doivent devenir des règles utiles, pas un journal infini.
 - Visual ambition with control : le mode sketch doit chercher du caractère sans perdre lisibilité, accessibilité et faisabilité.
+- Frontière source/rendu : `dev/` contient les sources du projet, y compris `dev/sketches/` pour les esquisses ; `public/` contient le rendu généré, ignoré pendant le développement courant mais conservable pour la production. `public/` n'est jamais la source de vérité.
 - Design d'attention pour outils critiques : pour une app médicale ou experte de suivi quotidien, guider le regard vers qui regarder maintenant, pourquoi c'est important, quelle décision prendre et ce qui peut attendre, plutôt qu'exposer tous les modules avec le même poids.
 
 ### Langage visuel
@@ -84,10 +85,10 @@ Open UI explore un framework agentique de design/dev UI : l'agent peut concevoir
 
 ### Questions ouvertes
 
-- Où stocker durablement les esquisses ?
 - Quel statut utiliser dans les données : `draft`, `sketch`, `canonical` ?
 - Comment promouvoir une esquisse sans laisser de dette ou de composants morts ?
 - Faut-il inclure les esquisses dans les commandes de listing ?
+- Comment compiler un texte de skill commun vers les formats propres à Codex, Claude, Copilot et aux harnais personnalisés sans faire diverger son contenu normatif ?
 
 ## Entrées
 

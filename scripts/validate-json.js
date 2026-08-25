@@ -85,4 +85,8 @@ if (errors.length) {
   process.exit(1)
 }
 
-console.log(`JSON valid: ${components.length} components, ${pages.length} pages`)
+if (!components.length && !pages.length) {
+  console.log('Workspace empty: no components or pages to validate')
+} else {
+  console.log(`JSON valid: ${components.length} components, ${pages.length} pages`)
+}

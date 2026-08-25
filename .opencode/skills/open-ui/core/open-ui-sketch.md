@@ -14,7 +14,7 @@ Produire une esquisse utile pour explorer une direction, pas un composant canoni
 2. Charger `design-sketching` si la demande implique de la divergence créative ou plusieurs directions.
 3. Annoncer que le travail est une esquisse hors DS canonique.
 4. Ne pas modifier un composant canonique, un token global ou une convention partagée sans confirmation explicite.
-5. Placer les fichiers HTML/CSS/JS autonomes dans `public/sketches/<slug>/`, jamais dans `dev/sketches/`.
+5. Placer les sources HTML/CSS/JS autonomes dans `dev/sketches/<slug>/`. `public/sketches/<slug>/` est uniquement le rendu généré par Vite.
 6. Réutiliser les tokens/patterns existants quand ça aide, mais ne pas brider l'exploration au point de tuer la recherche visuelle.
 7. Vérifier le rendu réel au navigateur si une UI est produite : ouvrir la page, contrôler le contenu visible et prendre une capture.
 8. Relire la capture comme un objet visuel, pas seulement le DOM : hiérarchie, rythme, densité, alignements, lisibilité, personnalité, responsive évident, impression générale.
@@ -42,7 +42,7 @@ En cas d'échec : corriger, reprendre un screenshot, puis seulement livrer.
 
 ## Règles de processus
 
-- Ne jamais répondre par un bloc complet HTML/CSS comme livrable final : écrire les fichiers dans `public/sketches/<slug>/`, puis vérifier.
+- Ne jamais répondre par un bloc complet HTML/CSS comme livrable final : écrire les sources dans `dev/sketches/<slug>/`, puis vérifier le rendu servi ou généré.
 - Avant de designer, fixer rapidement la mini-spec : persona principal, cas d'usage prioritaire, écran livré, ton visuel, composants indispensables.
 - Éviter le dashboard générique : le premier viewport doit raconter le produit, pas seulement afficher des cartes interchangeables.
 - Exploration esthétique autorisée ; régression fonctionnelle interdite.

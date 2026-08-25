@@ -7,7 +7,7 @@ description: Skill local de creation UI en phase amont pour Open UI. A utiliser 
 
 Ce skill sert a explorer avant de stabiliser. Il aide l'agent a produire des directions UI creatives sans tomber dans le rendu IA generique, tout en gardant assez de structure pour que les idees puissent ensuite devenir un design system.
 
-Quand le livrable est une maquette HTML/CSS/JS autonome, l'ecrire dans `public/sketches/<slug>/`. Ne jamais creer un nouveau sketch HTML directement consultable dans `dev/sketches/` : `dev/` est reserve au design system canonique, aux composants source et aux assets de build.
+Quand le livrable est une maquette HTML/CSS/JS autonome, écrire ses sources dans `dev/sketches/<slug>/`. `dev/` contient les sources du projet, canoniques ou exploratoires selon leur sous-dossier ; `public/sketches/<slug>/` est le rendu généré par Vite.
 
 ## Posture
 
@@ -84,7 +84,7 @@ Pour chaque direction :
 
 Quand du code ou une maquette est produit, marquer le statut comme experimental et l'isoler du design system canonique.
 
-Pour une maquette HTML autonome, l'isolation canonique est `public/sketches/<slug>/` avec fichiers ouvrables (`index.html`, `style.css`, JS local si besoin).
+Pour une maquette HTML autonome, l'isolation source est `dev/sketches/<slug>/` (`index.html`, `style.css`, JS local si besoin). Le rendu correspondant est servi ou généré dans `public/sketches/<slug>/`.
 
 ## Anti-generique
 

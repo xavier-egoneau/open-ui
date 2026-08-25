@@ -67,7 +67,7 @@ amk:
       3. Charger `design-sketching` si la demande implique de la divergence créative ou plusieurs directions.
       4. Annoncer que le travail est une esquisse hors DS canonique.
       5. Ne pas modifier un composant canonique, un token global ou une convention partagée sans confirmation explicite.
-      6. Placer les fichiers HTML/CSS/JS autonomes dans `public/sketches/<slug>/`, jamais dans `dev/sketches/`.
+      6. Placer les sources HTML/CSS/JS autonomes dans `dev/sketches/<slug>/`. `public/sketches/<slug>/` est uniquement le rendu généré par Vite.
       7. Ne jamais livrer un bloc complet HTML/CSS en conversation comme résultat final : le livrable doit être écrit dans les fichiers du sketch.
       8. Réutiliser les tokens/patterns existants quand ça aide, mais ne pas brider l'exploration au point de tuer la recherche visuelle.
       9. Éviter le dashboard générique : le premier viewport doit contenir au moins 3 éléments spécifiques au métier du produit.

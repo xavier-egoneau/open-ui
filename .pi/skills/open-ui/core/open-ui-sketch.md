@@ -14,7 +14,7 @@ Produire une esquisse utile pour explorer une direction, pas un composant canoni
 2. Charger `design-sketching` si la demande implique de la divergence créative ou plusieurs directions.
 3. Annoncer que le travail est une esquisse hors DS canonique.
 4. Ne pas modifier un composant canonique, un token global ou une convention partagée sans confirmation explicite.
-5. Placer les fichiers HTML/CSS/JS autonomes dans `public/sketches/<slug>/`, jamais dans `dev/sketches/`.
+5. Placer les sources HTML/CSS/JS autonomes dans `dev/sketches/<slug>/`. `public/sketches/<slug>/` est uniquement le rendu généré par Vite.
 6. Réutiliser les tokens/patterns existants quand ça aide, mais ne pas brider l'exploration au point de tuer la recherche visuelle.
 7. Vérifier le rendu réel au navigateur si une UI est produite : ouvrir la page, contrôler le contenu visible et prendre une capture exploitable.
 8. Relire la capture comme un objet visuel, pas seulement le DOM : hiérarchie, rythme, densité, alignements, lisibilité, personnalité, responsive évident, impression générale.
@@ -26,11 +26,11 @@ Produire une esquisse utile pour explorer une direction, pas un composant canoni
    - aucun texte parasite, contenu de debug, page quasi vide ou scroll horizontal évident n'est visible ;
    - le rendu contient au moins trois éléments spécifiques au domaine produit, non interchangeables avec une app générique.
 10. Considérer comme bloquant tout screenshot dominé par la navigation/sidebar/header, tout contenu principal sous le fold, toute divergence HTML/CSS structurelle, ou toute UI jolie mais générique qui ne raconte pas le produit.
-11. Ne jamais livrer un `/open-ui-sketch` final sous forme de code dump en conversation : créer/modifier les fichiers dans `public/sketches/<slug>/`, puis vérifier le rendu réel.
+11. Ne jamais livrer un `/open-ui-sketch` final sous forme de code dump en conversation : créer/modifier les sources dans `dev/sketches/<slug>/`, puis vérifier le rendu réel servi ou généré.
 12. Avant ou pendant la création, stabiliser une mini-spécification utile : persona principal, cas d'usage prioritaire, écran livré, ton visuel, composants indispensables.
 13. En cas d'échec visuel, corriger HTML/CSS, reprendre un screenshot et relire à nouveau avant livraison. Exploration esthétique autorisée ; régression fonctionnelle interdite.
 14. Livrer seulement après une passe `produire → screenshot → critique → correction` raisonnable, avec les limites explicites si la vision ou le navigateur est indisponible.
-15. Terminer par une sortie factuelle : fichiers créés, preuve visuelle, ce qui est visible dans le premier viewport, limites assumées, verdict `livré visuellement validé` ou `non livrable à corriger`, puis `À consolider si on garde cette direction`.J’ai
+15. Terminer par une sortie factuelle : fichiers créés, preuve visuelle, ce qui est visible dans le premier viewport, limites assumées, verdict `livré visuellement validé` ou `non livrable à corriger`, puis `À consolider si on garde cette direction`.
 
 ## Sortie attendue
 
@@ -45,4 +45,4 @@ Produire une esquisse utile pour explorer une direction, pas un composant canoni
 - Ne pas utiliser cette commande pour une modification normale de page/composant.
 - Ne pas transformer automatiquement l'esquisse en composant stable.
 - Ne pas laisser l'esquisse polluer la liste canonique du design system sans décision utilisateur.
-- Ne pas creer de nouveau sketch HTML autonome dans `dev/sketches/`.
+- Ne pas modifier directement le rendu généré dans `public/sketches/`.

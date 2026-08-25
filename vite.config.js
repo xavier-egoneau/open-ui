@@ -28,6 +28,42 @@ function copySketchesToPublic() {
   fs.cpSync(SKETCHES_DIR, PUBLIC_SKETCHES_DIR, { recursive: true })
 }
 
+function listPageSlugs() {
+  if (!fs.existsSync(PAGES_DIR)) return []
+  return fs.readdirSync(PAGES_DIR)
+    .filter(file => file.endsWith('.twig'))
+    .map(file => file.replace('.twig', ''))
+    .sort()
+}
+
+function listSketchSlugs() {
+  if (!fs.existsSync(SKETCHES_DIR)) return []
+  return fs.readdirSync(SKETCHES_DIR, { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .map(entry => entry.name)
+    .sort()
+}
+
+function escapeHtml(value) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;')
+}
+
+function renderWorkspaceIndex(pages, sketches) {
+  const pageContent = pages.length
+    ? `<ul>${pages.map(slug => `<li><a href="/${encodeURIComponent(slug)}.html">${escapeHtml(slug)}</a></li>`).join('\n')}</ul>`
+    : '<p>Aucune page source.</p>'
+  const sketchContent = sketches.length
+    ? `<ul>${sketches.map(slug => `<li><a href="/sketches/${encodeURIComponent(slug)}/">${escapeHtml(slug)}</a> <small>sketch</small></li>`).join('\n')}</ul>`
+    : '<p>Aucune esquisse source.</p>'
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Open UI</title></head><body><main><h1>Open UI</h1><section aria-labelledby="pages-title"><h2 id="pages-title">Pages</h2>${pageContent}</section><section aria-labelledby="sketches-title"><h2 id="sketches-title">Sketches</h2>${sketchContent}</section></main></body></html>`
+}
+
 function serveFile(filePath, res) {
   const ext = path.extname(filePath)
   const contentTypes = {
@@ -48,6 +84,14 @@ function serveFile(filePath, res) {
 
 function openUIPlugin() {
   let fullReloadTimer
+  const temporaryHtmlPaths = new Set()
+
+  function cleanupTemporaryHtml() {
+    for (const filePath of temporaryHtmlPaths) {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
+    }
+    temporaryHtmlPaths.clear()
+  }
 
   return {
     name: 'openui',
@@ -55,14 +99,20 @@ function openUIPlugin() {
     // Build : rend chaque page Twig → HTML temporaire, passé à Rollup comme entrée
     async config(cfg, { command }) {
       if (command !== 'build') return
-      const pages = fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.twig'))
+      const pages = listPageSlugs()
       const inputs = {}
-      for (const file of pages) {
-        const slug = file.replace('.twig', '')
-        const html = await renderTwig(path.join(PAGES_DIR, file), {})
+      for (const slug of pages) {
+        const html = await renderTwig(path.join(PAGES_DIR, `${slug}.twig`), {})
         const tmpPath = path.join(ROOT, `${slug}.html`)
         fs.writeFileSync(tmpPath, html, 'utf8')
+        temporaryHtmlPaths.add(tmpPath)
         inputs[slug] = tmpPath
+      }
+      if (!inputs.index) {
+        const indexPath = path.join(ROOT, 'index.html')
+        fs.writeFileSync(indexPath, renderWorkspaceIndex(pages, listSketchSlugs()), 'utf8')
+        temporaryHtmlPaths.add(indexPath)
+        inputs.index = indexPath
       }
       cfg.build ??= {}
       cfg.build.rollupOptions ??= {}
@@ -71,14 +121,12 @@ function openUIPlugin() {
 
     // Build : nettoie les HTML temporaires puis publie les esquisses séparément
     closeBundle() {
-      const pages = fs.existsSync(PAGES_DIR)
-        ? fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.twig'))
-        : []
-      for (const file of pages) {
-        const tmpPath = path.join(ROOT, file.replace('.twig', '.html'))
-        if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath)
-      }
+      cleanupTemporaryHtml()
       copySketchesToPublic()
+    },
+
+    buildEnd(error) {
+      if (error) cleanupTemporaryHtml()
     },
 
     // Dev : rendu Twig à la volée + preview des esquisses hors DS canonique
@@ -102,16 +150,8 @@ function openUIPlugin() {
 
         // Index : liste des pages disponibles et esquisses séparées
         if (!slug) {
-          const pages = fs.existsSync(PAGES_DIR)
-            ? fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.twig')).map(f => f.replace('.twig', ''))
-            : []
-          const sketches = fs.existsSync(SKETCHES_DIR)
-            ? fs.readdirSync(SKETCHES_DIR, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name)
-            : []
-          const pageLinks = pages.map(p => `<li><a href="/${p}.html">${p}</a></li>`).join('\n')
-          const sketchLinks = sketches.map(s => `<li><a href="/sketches/${s}/">${s}</a> <small>sketch</small></li>`).join('\n')
           res.setHeader('Content-Type', 'text/html; charset=utf-8')
-          res.end(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Pages</title></head><body><h1>Pages</h1><ul>${pageLinks}</ul><h2>Sketches</h2><ul>${sketchLinks}</ul></body></html>`)
+          res.end(renderWorkspaceIndex(listPageSlugs(), listSketchSlugs()))
           return
         }
 
