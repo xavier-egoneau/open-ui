@@ -1,10 +1,12 @@
 import 'virtual:openui-project-styles.scss'
 import { SHOWCASE_API, SHOWCASE_MESSAGES, SHOWCASE_PREVIEW_SOURCE, SHOWCASE_SOURCE } from '../shared/protocol.js'
+import { normalizeAxeResults } from './quality-state.js'
 
 const root = document.querySelector('#preview-root')
 const placeholder = document.querySelector('#preview-placeholder')
 const errorPanel = document.querySelector('#preview-error')
 let activeRequest = null
+let axeModulePromise = null
 
 window.addEventListener('message', handleMessage)
 document.addEventListener('submit', (event) => event.preventDefault())
@@ -32,6 +34,11 @@ async function handleMessage(event) {
 
   if (event.data.type === SHOWCASE_MESSAGES.settings) {
     document.body.dataset.background = event.data.background ?? 'light'
+    return
+  }
+
+  if (event.data.type === SHOWCASE_MESSAGES.audit) {
+    runAccessibilityAudit(event.data.revision)
     return
   }
 
@@ -79,6 +86,28 @@ async function handleMessage(event) {
     errorPanel.textContent = error.message
     postToShowcase(SHOWCASE_MESSAGES.error, { error: error.message, revision })
     reportHeight()
+  }
+}
+
+async function runAccessibilityAudit(revision) {
+  try {
+    axeModulePromise ??= import('axe-core').then((module) => module.default)
+    const axe = await axeModulePromise
+    const results = await axe.run(root, {
+      resultTypes: ['violations', 'incomplete', 'passes']
+    })
+
+    postToShowcase(SHOWCASE_MESSAGES.audited, {
+      revision,
+      violations: normalizeAxeResults(results.violations),
+      incomplete: normalizeAxeResults(results.incomplete),
+      passes: results.passes.length
+    })
+  } catch (error) {
+    postToShowcase(SHOWCASE_MESSAGES.auditError, {
+      revision,
+      error: error.message
+    })
   }
 }
 

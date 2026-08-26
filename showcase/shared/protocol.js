@@ -1,6 +1,7 @@
 export const SHOWCASE_API = {
   catalog: '/__openui/showcase/catalog',
-  render: '/__openui/showcase/render'
+  render: '/__openui/showcase/render',
+  validateHtml: '/__openui/showcase/validate-html'
 }
 
 export const SHOWCASE_MESSAGES = {
@@ -8,6 +9,9 @@ export const SHOWCASE_MESSAGES = {
   ready: 'openui:showcase:ready',
   render: 'openui:showcase:render',
   rendered: 'openui:showcase:rendered',
+  audit: 'openui:showcase:audit',
+  audited: 'openui:showcase:audited',
+  auditError: 'openui:showcase:audit-error',
   error: 'openui:showcase:error',
   resize: 'openui:showcase:resize',
   settings: 'openui:showcase:settings'

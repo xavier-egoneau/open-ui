@@ -46,9 +46,19 @@
           <p class="canvas__meta" id="component-meta">Sélectionnez un composant</p>
           <h2 id="component-title">Prévisualisation</h2>
           <p class="canvas__description" id="component-description">Le composant sera rendu seul dans une iframe isolée.</p>
+          <div class="quality-badges" aria-label="État des contrôles du rendu">
+            <span class="quality-badge" id="w3c-badge" data-status="idle">HTML · non testé</span>
+            <span class="quality-badge" id="axe-badge" data-status="idle">Axe · non testé</span>
+            <span class="quality-badge" data-status="manual">RGAA · manuel</span>
+          </div>
         </div>
 
         <div class="canvas__tools">
+          <div class="quality-action">
+            <span>Qualité</span>
+            <button id="run-quality" type="button" aria-describedby="quality-privacy" disabled>Contrôler le rendu</button>
+          </div>
+
           <fieldset class="viewport-picker" disabled>
             <legend>Largeur du canvas</legend>
             <label><input type="radio" name="viewport" value="auto" checked><span>Auto</span></label>
@@ -99,6 +109,47 @@
             </div>
           </div>
           <pre id="html-output-pre" tabindex="0" aria-labelledby="html-output-title" aria-busy="true"><code id="html-output-code">Sélectionnez un composant pour générer son HTML.</code></pre>
+        </div>
+      </details>
+
+      <details class="quality-output" id="quality-output">
+        <summary>
+          <span>Qualité du rendu</span>
+          <span class="quality-output__status" id="quality-status">Non testé</span>
+        </summary>
+        <div class="quality-output__content" id="quality-panel" aria-busy="false">
+          <div class="quality-output__intro">
+            <p id="quality-privacy">Le contrôle HTML transmet le rendu au service Nu configuré. Par défaut, il s’agit du service officiel W3C.</p>
+            <p id="quality-live" role="status"></p>
+          </div>
+
+          <div class="quality-results">
+            <section class="quality-result" aria-labelledby="w3c-result-title">
+              <p class="section-kicker">Conformité HTML</p>
+              <h3 id="w3c-result-title">Nu HTML Checker</h3>
+              <p class="quality-result__summary" id="w3c-summary">Lancez le contrôle sur le HTML actuellement rendu.</p>
+              <div class="quality-result__issues" id="w3c-results"></div>
+            </section>
+
+            <section class="quality-result" aria-labelledby="axe-result-title">
+              <p class="section-kicker">Accessibilité automatique</p>
+              <h3 id="axe-result-title">Axe</h3>
+              <p class="quality-result__summary" id="axe-summary">L’analyse porte uniquement sur la variante affichée.</p>
+              <div class="quality-result__issues" id="axe-results"></div>
+            </section>
+
+            <section class="quality-result quality-result--manual" aria-labelledby="rgaa-result-title">
+              <p class="section-kicker">Prévention RGAA</p>
+              <h3 id="rgaa-result-title">Vérifications manuelles</h3>
+              <p class="quality-result__summary">Les contrôles automatiques ne prouvent pas la conformité RGAA.</p>
+              <ul>
+                <li>Parcours clavier et visibilité du focus.</li>
+                <li>Restitution avec les technologies d’assistance.</li>
+                <li>Pertinence des libellés, alternatives et messages.</li>
+                <li>Comportement en zoom, reflow et contextes réels.</li>
+              </ul>
+            </section>
+          </div>
         </div>
       </details>
 

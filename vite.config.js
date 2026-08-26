@@ -6,6 +6,7 @@ import { SHOWCASE_API } from './showcase/shared/protocol.js'
 import { getShowcaseCatalog, getShowcaseComponent, normalizeComponentProps } from './showcase/server/catalog.js'
 import { readJsonBody, sendJson } from './showcase/server/http.js'
 import { createProjectStylesheetSource } from './showcase/server/project-style.js'
+import { validateHtmlWithW3c } from './showcase/server/html-validator.js'
 
 const ROOT = process.cwd()
 const PAGES_DIR = path.join(ROOT, 'dev/pages')
@@ -234,6 +235,32 @@ function openUIPlugin() {
           return
         }
 
+        if (pathname === SHOWCASE_API.validateHtml) {
+          if (req.method !== 'POST') {
+            sendJson(res, 405, { error: 'Méthode non autorisée.' })
+            return
+          }
+
+          try {
+            const payload = await readJsonBody(req)
+            if (typeof payload.html !== 'string' || !payload.html.trim()) {
+              sendJson(res, 400, { error: 'Aucun HTML à contrôler.' })
+              return
+            }
+
+            const result = await validateHtmlWithW3c(payload.html, {
+              endpoint: process.env.OPENUI_W3C_VALIDATOR_URL,
+              title: typeof payload.componentName === 'string'
+                ? `Open UI — ${payload.componentName}`
+                : 'Open UI component'
+            })
+            sendJson(res, 200, result)
+          } catch (error) {
+            sendJson(res, 502, { error: error.message })
+          }
+          return
+        }
+
         if (pathname.startsWith('/sketches/')) {
           const relativePath = decodeURIComponent(pathname.replace('/sketches/', ''))
           const requestedPath = path.normalize(path.join(SKETCHES_DIR, relativePath))
@@ -312,6 +339,8 @@ export default defineConfig({
   },
   publicDir: false,
   build: {
+    // axe-core reste isolé et chargé uniquement au lancement d'un contrôle.
+    chunkSizeWarningLimit: 600,
     outDir: 'public',
     emptyOutDir: true
   }

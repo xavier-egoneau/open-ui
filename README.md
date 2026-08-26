@@ -65,6 +65,28 @@ Le JSON décrit les métadonnées, variantes et contenus modifiables. Le Showcas
 
 Le contrat complet est documenté dans [GUIDELINES_AI.md](./GUIDELINES_AI.md) et [docs/component-model.md](./docs/component-model.md).
 
+## Contrôler la qualité du rendu
+
+Dans le Showcase, Axe analyse automatiquement chaque nouveau rendu après une courte temporisation. Le bouton `Contrôler le rendu` relance Axe et ajoute la validation HTML W3C sur la variante actuellement affichée :
+
+- **Nu HTML Checker** contrôle la conformité du fragment dans un document HTML minimal ;
+- **Axe** contrôle localement les règles d’accessibilité automatisables dans l’iframe, sans envoyer le DOM à un service externe.
+
+Le panneau conserve séparément les erreurs HTML, les violations Axe et les vérifications RGAA manuelles. Un résultat sans erreur est formulé `Aucune erreur automatique détectée` : il ne constitue jamais une preuve de conformité RGAA.
+
+Par défaut, le HTML rendu est transmis au service officiel `https://validator.w3.org/nu/`. Aucun JSON, Twig ou SCSS n’est envoyé. Pour utiliser une instance Nu locale ou privée, configurez son URL avant de lancer Vite :
+
+```powershell
+$env:OPENUI_W3C_VALIDATOR_URL = 'http://localhost:8888/'
+npm.cmd run dev
+```
+
+```bash
+OPENUI_W3C_VALIDATOR_URL=http://localhost:8888/ npm run dev
+```
+
+Si le service Nu est indisponible, le Showcase affiche un contrôle HTML partiel sans bloquer l’analyse Axe locale.
+
 ## Architecture
 
 ```text

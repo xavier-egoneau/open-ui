@@ -21,11 +21,23 @@ Puis ouvrir `/showcase/` depuis l'index Open UI.
 - le formulaire du Showcase ne modifie jamais les JSON : ses valeurs sont temporaires ;
 - les contrôles `array` avec un schéma `item` utilisent un éditeur de liste avec ajout, suppression et champs nommés ; le JSON brut reste uniquement un repli quand la forme d'un item est indéterminable ;
 - le panneau `HTML généré` expose et copie uniquement le dernier HTML effectivement rendu dans l'iframe ; la copie est désactivée pendant une mise à jour ou après une erreur ;
+- Axe analyse automatiquement chaque nouveau rendu ; le bouton `Contrôler le rendu` relance Axe et ajoute le Nu HTML Checker sur la variante courante ;
+- le catalogue conserve le dernier statut automatique de chaque composant pendant la session et l'invalide lorsque ses props changent ;
+- les résultats automatiques restent séparés des vérifications RGAA manuelles et ne doivent jamais être présentés comme une conformité ;
 - les relations `parts`, `collections`, `families`, `instances` et `layoutGroups` sont présentées comme contrat de composition ; les contrôles effectivement rendus viennent des groupes `variants` et `content` du composant sélectionné ;
 - le rendu live dépend du serveur Vite et n'est pas destiné à fonctionner en `file://`.
 
 ## Rendu live
 
 Le shell et l'iframe communiquent par `postMessage`. L'iframe appelle l'API locale de rendu, injecte uniquement le HTML du composant et conserve la feuille de styles du projet chargée. Chaque demande porte une révision : le shell ignore une réponse ancienne et n'expose à la copie que le HTML correspondant au rendu courant. Un changement de valeur rerend le composant ; un changement de source JSON, Twig ou SCSS passe par le watcher Vite.
+
+## Contrôles qualité
+
+- Axe est importé dans l'iframe et analyse uniquement le DOM du composant rendu.
+- Le contrôle W3C encapsule le fragment dans un document minimal puis l'envoie depuis le serveur Vite au Nu HTML Checker.
+- Le service W3C officiel est utilisé par défaut. `OPENUI_W3C_VALIDATOR_URL` permet de cibler une instance locale ou privée.
+- Une indisponibilité réseau n'empêche pas Axe de produire son résultat.
+- Les contrôles portent sur l'état courant des variables, pas sur toutes les combinaisons possibles.
+- Clavier, lecteurs d'écran, pertinence éditoriale, zoom/reflow et contexte réel restent à vérifier manuellement.
 
 Le contrat de démarrage sans `dev/` ni `public/` se vérifie avec `npm run test:empty`.

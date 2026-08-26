@@ -1,5 +1,6 @@
 import { SHOWCASE_API, SHOWCASE_MESSAGES, SHOWCASE_PREVIEW_SOURCE, SHOWCASE_SOURCE } from '../shared/protocol.js'
 import { getComponentDefaults, renderComposition, renderControls } from './controls.js'
+import { summarizeQualityReport } from './quality-state.js'
 import { isCurrentRender, normalizeRenderedHtml } from './render-state.js'
 
 const LEVEL_ORDER = ['atom', 'molecule', 'organism', 'template']
@@ -35,6 +36,17 @@ const elements = {
   htmlCode: document.querySelector('#html-output-code'),
   copyHtml: document.querySelector('#copy-html'),
   copyHtmlStatus: document.querySelector('#copy-html-status'),
+  qualityButton: document.querySelector('#run-quality'),
+  qualityOutput: document.querySelector('#quality-output'),
+  qualityPanel: document.querySelector('#quality-panel'),
+  qualityStatus: document.querySelector('#quality-status'),
+  qualityLive: document.querySelector('#quality-live'),
+  w3cBadge: document.querySelector('#w3c-badge'),
+  w3cSummary: document.querySelector('#w3c-summary'),
+  w3cResults: document.querySelector('#w3c-results'),
+  axeBadge: document.querySelector('#axe-badge'),
+  axeSummary: document.querySelector('#axe-summary'),
+  axeResults: document.querySelector('#axe-results'),
   background: document.querySelector('#preview-background')
 }
 
@@ -45,7 +57,11 @@ const state = {
   previewReady: false,
   renderTimer: null,
   renderRevision: 0,
-  renderedHtml: ''
+  renderedHtml: '',
+  qualityRunId: 0,
+  qualityTimer: null,
+  activeQualityRun: null,
+  qualityReports: new Map()
 }
 
 elements.search.addEventListener('input', () => renderCatalog(elements.search.value))
@@ -53,6 +69,7 @@ elements.reset.addEventListener('click', resetSelectedComponent)
 elements.background.addEventListener('change', sendPreviewSettings)
 elements.previewFrame.addEventListener('load', connectPreview)
 elements.copyHtml.addEventListener('click', copyRenderedHtml)
+elements.qualityButton.addEventListener('click', runQualityChecks)
 
 for (const input of document.querySelectorAll('input[name="viewport"]')) {
   input.addEventListener('change', updateViewport)
@@ -143,7 +160,17 @@ function renderCatalog(query) {
       const category = document.createElement('span')
       category.className = 'component-button__category'
       category.textContent = component.category
-      button.append(name, category)
+      const qualitySummary = summarizeQualityReport(state.qualityReports.get(component.id))
+      const quality = document.createElement('span')
+      quality.className = 'component-button__quality'
+      quality.dataset.status = qualitySummary.status
+      quality.textContent = qualitySummary.catalogLabel
+      quality.title = `Dernier contrôle automatique : ${qualitySummary.label}`
+      quality.setAttribute('aria-hidden', 'true')
+      const qualityLabel = document.createElement('span')
+      qualityLabel.className = 'visually-hidden'
+      qualityLabel.textContent = `Dernier contrôle automatique : ${qualitySummary.label}.`
+      button.append(name, category, quality, qualityLabel)
       item.append(button)
       list.append(item)
     }
@@ -210,6 +237,7 @@ function showEmptyWorkspace() {
   elements.htmlStatus.textContent = 'Aucun composant'
   elements.htmlPre.setAttribute('aria-busy', 'false')
   elements.htmlCode.textContent = '<!-- Ajoutez un composant pour générer son HTML. -->'
+  resetQualityPanel('Aucun composant à contrôler.')
 }
 
 function showWorkspaceError(message) {
@@ -225,6 +253,7 @@ function showWorkspaceError(message) {
 
 function updateProp(key, value) {
   state.props[key] = value
+  forgetSelectedQualityReport()
   updatePropsOutput()
   scheduleRender(false)
 }
@@ -232,6 +261,7 @@ function updateProp(key, value) {
 function resetSelectedComponent() {
   if (!state.selected) return
   state.props = getComponentDefaults(state.selected)
+  forgetSelectedQualityReport()
   renderControls(elements.controls, state.selected, state.props, updateProp)
   updatePropsOutput()
   scheduleRender(true)
@@ -246,6 +276,7 @@ function scheduleRender(immediate) {
   state.renderRevision += 1
   elements.renderStatus.textContent = 'Mise à jour du rendu…'
   invalidateRenderedHtml()
+  resetQualityPanel('Le rendu a changé. Relancez les contrôles.')
 
   if (immediate) {
     sendRender()
@@ -274,6 +305,7 @@ function invalidateRenderedHtml() {
   elements.htmlCode.textContent = 'Le HTML sera disponible après le prochain rendu.'
   elements.copyHtml.disabled = true
   elements.copyHtmlStatus.textContent = ''
+  elements.qualityButton.disabled = true
 }
 
 function updateRenderedHtml(html) {
@@ -283,6 +315,313 @@ function updateRenderedHtml(html) {
   elements.htmlCode.textContent = state.renderedHtml || '<!-- Le composant ne produit aucun HTML. -->'
   elements.copyHtml.disabled = !state.renderedHtml
   elements.copyHtmlStatus.textContent = ''
+  elements.qualityButton.disabled = !state.renderedHtml
+}
+
+function forgetSelectedQualityReport() {
+  if (!state.selected) return
+  if (state.qualityReports.delete(state.selected.id)) renderCatalog(elements.search.value)
+}
+
+function resetQualityPanel(message = 'Lancez les contrôles sur le rendu courant.') {
+  clearTimeout(state.qualityTimer)
+  state.activeQualityRun = null
+  elements.qualityButton.disabled = true
+  elements.qualityPanel.setAttribute('aria-busy', 'false')
+  elements.qualityStatus.textContent = 'Non testé'
+  elements.qualityLive.textContent = message
+  setQualityBadge(elements.w3cBadge, 'idle', 'HTML · non testé')
+  setQualityBadge(elements.axeBadge, 'idle', 'Axe · non testé')
+  elements.w3cSummary.textContent = 'Lancez le contrôle sur le HTML actuellement rendu.'
+  elements.axeSummary.textContent = 'L’analyse porte uniquement sur la variante affichée.'
+  elements.w3cResults.replaceChildren()
+  elements.axeResults.replaceChildren()
+}
+
+function runQualityChecks() {
+  if (!state.selected || !state.renderedHtml || !state.previewReady) return
+
+  clearTimeout(state.qualityTimer)
+
+  const report = {
+    id: ++state.qualityRunId,
+    componentId: state.selected.id,
+    componentName: state.selected.name,
+    revision: state.renderRevision,
+    w3c: { status: 'pending' },
+    axe: { status: 'pending' }
+  }
+
+  state.activeQualityRun = report
+  state.qualityReports.set(report.componentId, report)
+  elements.qualityOutput.open = true
+  elements.qualityPanel.setAttribute('aria-busy', 'true')
+  elements.qualityButton.disabled = true
+  elements.qualityLive.textContent = 'Contrôles W3C et Axe en cours…'
+  renderQualityReport(report)
+  renderCatalog(elements.search.value)
+
+  requestAxeAudit(report)
+
+  runW3cCheck(report)
+}
+
+function scheduleAutomaticAxeCheck() {
+  clearTimeout(state.qualityTimer)
+  if (!state.selected || !state.renderedHtml || !state.previewReady) return
+
+  const report = {
+    id: ++state.qualityRunId,
+    componentId: state.selected.id,
+    componentName: state.selected.name,
+    revision: state.renderRevision,
+    w3c: { status: 'idle' },
+    axe: { status: 'pending' }
+  }
+
+  state.activeQualityRun = report
+  state.qualityReports.set(report.componentId, report)
+  elements.qualityPanel.setAttribute('aria-busy', 'true')
+  elements.qualityButton.disabled = true
+  elements.qualityLive.textContent = 'Analyse Axe locale en cours…'
+  renderQualityReport(report)
+  renderCatalog(elements.search.value)
+
+  state.qualityTimer = setTimeout(() => requestAxeAudit(report), 240)
+}
+
+function requestAxeAudit(report) {
+  if (!isActiveQualityRun(report)) return
+  elements.previewFrame.contentWindow.postMessage({
+    source: SHOWCASE_SOURCE,
+    type: SHOWCASE_MESSAGES.audit,
+    revision: report.revision
+  }, location.origin)
+}
+
+async function runW3cCheck(report) {
+  try {
+    const response = await fetch(SHOWCASE_API.validateHtml, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        html: state.renderedHtml,
+        componentName: report.componentName
+      })
+    })
+    const payload = await response.json()
+    if (!response.ok) throw new Error(payload.error ?? 'Le contrôle HTML a échoué.')
+    if (!isActiveQualityRun(report)) return
+    report.w3c = { status: 'done', result: payload }
+  } catch (error) {
+    if (!isActiveQualityRun(report)) return
+    report.w3c = { status: 'error', error: error.message }
+  }
+
+  renderQualityReport(report)
+}
+
+function isActiveQualityRun(report) {
+  return state.activeQualityRun?.id === report.id
+    && state.renderRevision === report.revision
+    && state.selected?.id === report.componentId
+}
+
+function renderQualityReport(report) {
+  if (!isActiveQualityRun(report)) return
+
+  renderW3cState(report.w3c)
+  renderAxeState(report.axe)
+
+  const summary = summarizeQualityReport(report)
+  elements.qualityStatus.textContent = summary.label
+  state.qualityReports.set(report.componentId, report)
+
+  const pending = report.w3c.status === 'pending' || report.axe.status === 'pending'
+  if (pending) return
+
+  elements.qualityPanel.setAttribute('aria-busy', 'false')
+  elements.qualityButton.disabled = false
+  elements.qualityLive.textContent = report.w3c.status === 'idle'
+    ? `${summary.label}. Lancez le contrôle du rendu pour vérifier le HTML W3C. Une revue RGAA manuelle reste nécessaire.`
+    : `${summary.label}. Une revue RGAA manuelle reste nécessaire.`
+  renderCatalog(elements.search.value)
+}
+
+function renderW3cState(check) {
+  if (check.status === 'idle') {
+    setQualityBadge(elements.w3cBadge, 'idle', 'HTML · non testé')
+    elements.w3cSummary.textContent = 'Cliquez sur « Contrôler le rendu » pour appeler le service Nu configuré.'
+    elements.w3cResults.replaceChildren()
+    return
+  }
+
+  if (check.status === 'pending') {
+    setQualityBadge(elements.w3cBadge, 'pending', 'HTML · contrôle…')
+    elements.w3cSummary.textContent = 'Validation du document encapsulant le composant…'
+    elements.w3cResults.replaceChildren()
+    return
+  }
+
+  if (check.status === 'error') {
+    setQualityBadge(elements.w3cBadge, 'review', 'HTML · indisponible')
+    elements.w3cSummary.textContent = check.error
+    elements.w3cResults.replaceChildren(createQualityMessage('Le résultat Axe reste utilisable. Vérifiez la connexion ou configurez une instance Nu locale.'))
+    return
+  }
+
+  const { errors, warnings } = check.result
+  const status = errors > 0 ? 'fail' : warnings > 0 ? 'review' : 'pass'
+  setQualityBadge(elements.w3cBadge, status, errors > 0
+    ? `HTML · ${errors} erreur${errors > 1 ? 's' : ''}`
+    : warnings > 0
+      ? `HTML · ${warnings} alerte${warnings > 1 ? 's' : ''}`
+      : 'HTML · aucune erreur')
+  elements.w3cSummary.textContent = errors || warnings
+    ? `${errors} erreur${errors > 1 ? 's' : ''}, ${warnings} avertissement${warnings > 1 ? 's' : ''}.`
+    : 'Aucune erreur ni avertissement signalé par le Nu HTML Checker.'
+  renderW3cIssues(check.result.messages)
+}
+
+function renderW3cIssues(messages = []) {
+  const issues = messages.filter((message) => message.type === 'error' || message.type === 'warning')
+  elements.w3cResults.replaceChildren()
+
+  if (!issues.length) {
+    elements.w3cResults.append(createQualityMessage('Le HTML est valide dans le contexte de test généré.'))
+    return
+  }
+
+  for (const issue of issues) {
+    const card = createQualityIssue(issue.type)
+    const title = document.createElement('h4')
+    title.textContent = issue.type === 'error' ? 'Erreur HTML' : 'Avertissement HTML'
+    const description = document.createElement('p')
+    const location = issue.lastLine ? ` — ligne ${issue.lastLine}` : ''
+    description.textContent = `${issue.message}${location}`
+    card.append(title, description)
+
+    if (issue.extract) {
+      const extract = document.createElement('code')
+      extract.textContent = issue.extract
+      card.append(extract)
+    }
+
+    elements.w3cResults.append(card)
+  }
+}
+
+function renderAxeState(check) {
+  if (check.status === 'pending') {
+    setQualityBadge(elements.axeBadge, 'pending', 'Axe · analyse…')
+    elements.axeSummary.textContent = 'Analyse du DOM rendu dans l’iframe…'
+    elements.axeResults.replaceChildren()
+    return
+  }
+
+  if (check.status === 'error') {
+    setQualityBadge(elements.axeBadge, 'review', 'Axe · indisponible')
+    elements.axeSummary.textContent = check.error
+    elements.axeResults.replaceChildren(createQualityMessage('Le contrôle HTML W3C reste utilisable.'))
+    return
+  }
+
+  const violations = check.result.violations ?? []
+  const incomplete = check.result.incomplete ?? []
+  const violationNodes = violations.reduce((total, item) => total + item.nodes.length, 0)
+  const incompleteNodes = incomplete.reduce((total, item) => total + item.nodes.length, 0)
+  const status = violationNodes > 0 ? 'fail' : incompleteNodes > 0 ? 'review' : 'pass'
+  setQualityBadge(elements.axeBadge, status, violationNodes > 0
+    ? `Axe · ${violationNodes} violation${violationNodes > 1 ? 's' : ''}`
+    : incompleteNodes > 0
+      ? `Axe · ${incompleteNodes} à vérifier`
+      : 'Axe · aucune violation')
+  elements.axeSummary.textContent = violationNodes || incompleteNodes
+    ? `${violationNodes} violation${violationNodes > 1 ? 's' : ''}, ${incompleteNodes} point${incompleteNodes > 1 ? 's' : ''} à vérifier.`
+    : `Aucune violation automatique détectée ; ${check.result.passes ?? 0} règles passées.`
+  renderAxeIssues(violations, incomplete)
+}
+
+function renderAxeIssues(violations = [], incomplete = []) {
+  elements.axeResults.replaceChildren()
+  const issues = [
+    ...violations.map((result) => ({ result, review: false })),
+    ...incomplete.map((result) => ({ result, review: true }))
+  ]
+
+  if (!issues.length) {
+    elements.axeResults.append(createQualityMessage('Axe n’a trouvé aucune violation dans la variante affichée.'))
+    return
+  }
+
+  for (const { result, review } of issues) {
+    const severity = review ? 'review' : result.impact
+    const card = createQualityIssue(severity)
+    const title = document.createElement('h4')
+    title.textContent = `${review ? 'À vérifier' : impactLabel(result.impact)} — ${result.help}`
+    const description = document.createElement('p')
+    description.textContent = result.description
+    const count = document.createElement('p')
+    count.textContent = `${result.nodes.length} élément${result.nodes.length > 1 ? 's' : ''} concerné${result.nodes.length > 1 ? 's' : ''}.`
+    card.append(title, description, count)
+
+    for (const node of result.nodes.slice(0, 3)) {
+      const code = document.createElement('code')
+      const target = node.target.length ? node.target.join(' ') : 'Cible non fournie'
+      code.textContent = `${target}\n${node.html}${node.failureSummary ? `\n${node.failureSummary}` : ''}`
+      card.append(code)
+    }
+
+    if (isSafeHttpUrl(result.helpUrl)) {
+      const help = document.createElement('a')
+      help.href = result.helpUrl
+      help.target = '_blank'
+      help.rel = 'noreferrer'
+      help.textContent = 'Documentation de la règle Axe'
+      card.append(help)
+    }
+
+    elements.axeResults.append(card)
+  }
+}
+
+function createQualityIssue(severity) {
+  const card = document.createElement('article')
+  card.className = 'quality-issue'
+  card.dataset.severity = severity || 'review'
+  return card
+}
+
+function createQualityMessage(text) {
+  const message = document.createElement('p')
+  message.className = 'quality-result__summary'
+  message.textContent = text
+  return message
+}
+
+function setQualityBadge(element, status, text) {
+  element.dataset.status = status
+  element.textContent = text
+}
+
+function impactLabel(impact) {
+  return {
+    critical: 'Critique',
+    serious: 'Sérieux',
+    moderate: 'Modéré',
+    minor: 'Mineur'
+  }[impact] ?? 'Violation'
+}
+
+function isSafeHttpUrl(value) {
+  try {
+    return ['http:', 'https:'].includes(new URL(value).protocol)
+  } catch {
+    return false
+  }
 }
 
 async function copyRenderedHtml() {
@@ -320,6 +659,7 @@ function connectPreview() {
     state.renderRevision += 1
     elements.renderStatus.textContent = 'Reconnexion au rendu…'
     invalidateRenderedHtml()
+    resetQualityPanel('L’iframe a été reconnectée. Relancez les contrôles.')
   }
   elements.previewFrame.contentWindow?.postMessage({
     source: SHOWCASE_SOURCE,
@@ -334,6 +674,10 @@ function sendPreviewSettings() {
     type: SHOWCASE_MESSAGES.settings,
     background: elements.background.value
   }, location.origin)
+  if (state.renderedHtml) {
+    forgetSelectedQualityReport()
+    scheduleAutomaticAxeCheck()
+  }
 }
 
 function updateViewport(event) {
@@ -341,6 +685,10 @@ function updateViewport(event) {
   elements.previewShell.style.width = event.target.value === 'auto'
     ? '100%'
     : `${event.target.value}px`
+  if (state.renderedHtml) {
+    forgetSelectedQualityReport()
+    scheduleAutomaticAxeCheck()
+  }
 }
 
 function handlePreviewMessage(event) {
@@ -359,6 +707,32 @@ function handlePreviewMessage(event) {
     if (!isCurrentRender(event.data.revision, state.renderRevision)) return
     elements.renderStatus.textContent = 'Rendu à jour'
     updateRenderedHtml(event.data.html)
+    scheduleAutomaticAxeCheck()
+    return
+  }
+
+  if (event.data.type === SHOWCASE_MESSAGES.audited) {
+    const report = state.activeQualityRun
+    if (!report || !isCurrentRender(event.data.revision, report.revision)) return
+    if (!isActiveQualityRun(report)) return
+    report.axe = {
+      status: 'done',
+      result: {
+        violations: event.data.violations ?? [],
+        incomplete: event.data.incomplete ?? [],
+        passes: event.data.passes ?? 0
+      }
+    }
+    renderQualityReport(report)
+    return
+  }
+
+  if (event.data.type === SHOWCASE_MESSAGES.auditError) {
+    const report = state.activeQualityRun
+    if (!report || !isCurrentRender(event.data.revision, report.revision)) return
+    if (!isActiveQualityRun(report)) return
+    report.axe = { status: 'error', error: event.data.error ?? 'L’analyse Axe a échoué.' }
+    renderQualityReport(report)
     return
   }
 
@@ -371,6 +745,7 @@ function handlePreviewMessage(event) {
     elements.htmlCode.textContent = `<!-- ${event.data.error} -->`
     elements.copyHtml.disabled = true
     elements.copyHtmlStatus.textContent = ''
+    resetQualityPanel('Le rendu doit être corrigé avant de lancer les contrôles.')
     return
   }
 
