@@ -7,6 +7,7 @@ const components = getComponentEntries()
 const pages = getPageEntries()
 const componentIds = new Set(components.map((component) => component.id))
 const allowedControlTypes = new Set(['select', 'checkbox', 'text', 'color', 'number', 'array', 'component-params'])
+const allowedArrayItemTypes = new Set(['select', 'checkbox', 'text', 'color', 'number'])
 const allowedLevels = new Set(['atom', 'molecule', 'organism', 'template'])
 
 function fail(file, message) {
@@ -15,6 +16,36 @@ function fail(file, message) {
 
 function warn(file, message) {
   warnings.push(`${file}: ${message}`)
+}
+
+function validateArrayItem(file, controlPath, item) {
+  if (!item || typeof item !== 'object' || Array.isArray(item)) {
+    fail(file, `${controlPath}.item must be an object`)
+    return
+  }
+
+  if (item.fields && typeof item.fields === 'object' && !Array.isArray(item.fields)) {
+    if (!Object.keys(item.fields).length) fail(file, `${controlPath}.item.fields must not be empty`)
+    validateControls(file, `${controlPath}.item.fields`, item.fields)
+    for (const [fieldKey, field] of Object.entries(item.fields)) {
+      if (field.type && !allowedArrayItemTypes.has(field.type)) {
+        fail(file, `${controlPath}.item.fields.${fieldKey} has unsupported nested type "${field.type}"`)
+      }
+    }
+    return
+  }
+
+  if (!item.type) {
+    fail(file, `${controlPath}.item must define type or fields`)
+    return
+  }
+
+  if (!allowedArrayItemTypes.has(item.type)) {
+    fail(file, `${controlPath}.item has unsupported type "${item.type}"`)
+  }
+  if (item.type === 'select' && !Array.isArray(item.options)) {
+    fail(file, `${controlPath}.item select control must define options[]`)
+  }
 }
 
 function validateControls(file, groupName, controls = {}) {
@@ -30,6 +61,11 @@ function validateControls(file, groupName, controls = {}) {
     }
     if (control.type === 'select' && !Array.isArray(control.options)) {
       fail(file, `${groupName}.${key} select control must define options[]`)
+    }
+    if (control.type === 'array') {
+      if (!Array.isArray(control.default)) fail(file, `${groupName}.${key} array control default must be an array`)
+      if (control.item) validateArrayItem(file, `${groupName}.${key}`, control.item)
+      else warn(file, `${groupName}.${key} array control has no item schema; Showcase will use JSON fallback`)
     }
     if (!Object.hasOwn(control, 'default')) warn(file, `${groupName}.${key} has no default`)
   }

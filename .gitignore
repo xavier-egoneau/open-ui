@@ -7,3 +7,4 @@ dev/*
 .env
 .env.*
 !.env.example
+.openui-empty-*/

@@ -16,6 +16,13 @@ Open UI est un workspace de design system agent-first. Le modele composant doit 
 - Un composant doit etre reutilise avant d'etre recree.
 - Modifier une page signifie souvent modifier un composant ou une configuration de composant, pas patcher la page directement.
 
+## Démarrage à vide
+
+- `showcase/` appartient au moteur versionné et n'est pas généré par le workspace utilisateur.
+- `dev/` peut ne contenir que `.gitkeep`, ou être momentanément absent : la cartographie et le Showcase doivent alors retourner zéro composant sans échouer.
+- `dev/assets/scss/style.scss` devient nécessaire seulement lorsqu'un projet commence à définir ses styles ; le Showcase fournit une feuille vide avant sa création.
+- `public/` n'est jamais un prérequis : `npm run build` le crée comme sortie générée.
+
 ## Hierarchie
 
 - `atom` : element UI indivisible.
@@ -33,6 +40,32 @@ La composition reste descendante : un atom n'inclut pas une molecule, un organis
 - `families` : reglages communs pour composants repetes non editoriaux.
 - `instances` : occurrences concretes editables individuellement.
 - `layoutGroups` : placement, grilles, lignes et groupes visuels.
+
+## Contrôles de liste
+
+Un contrôle `type: "array"` peut déclarer la forme humaine de chaque élément avec `item` :
+
+```json
+{
+  "label": "Liens de navigation",
+  "type": "array",
+  "item": {
+    "label": "Lien",
+    "addLabel": "Ajouter un lien",
+    "fields": {
+      "text": { "label": "Libellé", "type": "text", "default": "Nouveau lien" },
+      "href": { "label": "Destination", "type": "text", "default": "#" }
+    }
+  },
+  "default": []
+}
+```
+
+- `item.fields` décrit un objet répétable ; chaque clé devient un champ du Showcase.
+- `item.type` décrit une liste de valeurs simples, par exemple du texte ou des nombres.
+- Les types imbriqués acceptés sont `text`, `number`, `checkbox`, `select` et `color`.
+- Si `item` manque mais que la liste contient déjà des valeurs, le Showcase tente d'en déduire la forme.
+- Une liste vide sans schéma `item` conserve l'éditeur JSON comme repli, car sa structure ne peut pas être devinée sans risque.
 
 ## Questions a resoudre
 

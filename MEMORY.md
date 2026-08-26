@@ -59,6 +59,8 @@ Open UI explore un framework agentique de design/dev UI : l'agent peut concevoir
 - Recherche / commande : piste pertinente pour les usages agentiques et experts.
 - Sélection : visible, réversible et proche de l'objet manipulé.
 - Édition : contextualisée, avec états clairs.
+- Édition structurée : dans les outils destinés aux humains, traduire les tableaux et objets en champs nommés et contrôles répétables ; réserver le JSON brut au diagnostic ou aux formes impossibles à déduire.
+- Handoff développeur : un outil de design system doit exposer le HTML réellement généré par l'état live, le rendre sélectionnable et copiable, et bloquer la copie tant que le rendu est périmé ou en erreur.
 - Feedback : explicite pour loading, erreur, succès, brouillon, statut expérimental.
 - États IA : rendre visibles attente, confiance, provenance et action suivante quand applicable.
 - États vides / erreur / loading : à prévoir tôt, même en sketch.

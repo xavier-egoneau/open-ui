@@ -2,13 +2,21 @@ import fs from 'fs'
 import path from 'path'
 import { defineConfig } from 'vite'
 import Twig from 'twig'
+import { SHOWCASE_API } from './showcase/shared/protocol.js'
+import { getShowcaseCatalog, getShowcaseComponent, normalizeComponentProps } from './showcase/server/catalog.js'
+import { readJsonBody, sendJson } from './showcase/server/http.js'
+import { createProjectStylesheetSource } from './showcase/server/project-style.js'
 
 const ROOT = process.cwd()
 const PAGES_DIR = path.join(ROOT, 'dev/pages')
 const SKETCHES_DIR = path.join(ROOT, 'dev/sketches')
+const SHOWCASE_DIR = path.join(ROOT, 'showcase')
+const PROJECT_STYLESHEET = path.join(ROOT, 'dev/assets/scss/style.scss')
 const OUT_DIR = path.join(ROOT, 'public')
 const PUBLIC_SKETCHES_DIR = path.join(OUT_DIR, 'sketches')
 const FULL_RELOAD_DELAY = 150
+const PROJECT_STYLESHEET_ID = 'virtual:openui-project-styles.scss'
+const RESOLVED_PROJECT_STYLESHEET_ID = `\0${PROJECT_STYLESHEET_ID}`
 
 // Les includes utilisent des chemins depuis la racine ('dev/components/...')
 // settings.views = ROOT indique à twig 3.x d'utiliser ROOT comme base de résolution.
@@ -61,7 +69,7 @@ function renderWorkspaceIndex(pages, sketches) {
     ? `<ul>${sketches.map(slug => `<li><a href="./sketches/${encodeURIComponent(slug)}/">${escapeHtml(slug)}</a> <small>sketch</small></li>`).join('\n')}</ul>`
     : '<p>Aucune esquisse source.</p>'
 
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Open UI</title></head><body><main><h1>Open UI</h1><section aria-labelledby="pages-title"><h2 id="pages-title">Pages</h2>${pageContent}</section><section aria-labelledby="sketches-title"><h2 id="sketches-title">Sketches</h2>${sketchContent}</section></main></body></html>`
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Open UI</title></head><body><main><h1>Open UI</h1><section aria-labelledby="design-system-title"><h2 id="design-system-title">Design system</h2><p><a href="./showcase/">Ouvrir Open UI Showcase</a></p></section><section aria-labelledby="pages-title"><h2 id="pages-title">Pages</h2>${pageContent}</section><section aria-labelledby="sketches-title"><h2 id="sketches-title">Sketches</h2>${sketchContent}</section></main></body></html>`
 }
 
 function inlineBuiltStylesheets() {
@@ -132,6 +140,16 @@ function openUIPlugin() {
   return {
     name: 'openui',
 
+    resolveId(id) {
+      if (id === PROJECT_STYLESHEET_ID) return RESOLVED_PROJECT_STYLESHEET_ID
+    },
+
+    load(id) {
+      if (id !== RESOLVED_PROJECT_STYLESHEET_ID) return
+      if (fs.existsSync(PROJECT_STYLESHEET)) this.addWatchFile(PROJECT_STYLESHEET)
+      return createProjectStylesheetSource(PROJECT_STYLESHEET)
+    },
+
     // Build : rend chaque page Twig → HTML temporaire, passé à Rollup comme entrée
     async config(cfg, { command }) {
       if (command !== 'build') return
@@ -144,6 +162,8 @@ function openUIPlugin() {
         temporaryHtmlPaths.add(tmpPath)
         inputs[slug] = tmpPath
       }
+      inputs['showcase/index'] = path.join(SHOWCASE_DIR, 'index.html')
+      inputs['showcase/preview'] = path.join(SHOWCASE_DIR, 'preview.html')
       if (!inputs.index) {
         const indexPath = path.join(ROOT, 'index.html')
         fs.writeFileSync(indexPath, renderWorkspaceIndex(pages, listSketchSlugs()), 'utf8')
@@ -170,6 +190,49 @@ function openUIPlugin() {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const pathname = new URL(req.url, 'http://localhost').pathname
+
+        if (pathname === SHOWCASE_API.catalog) {
+          if (req.method !== 'GET') {
+            sendJson(res, 405, { error: 'Méthode non autorisée.' })
+            return
+          }
+
+          sendJson(res, 200, { components: getShowcaseCatalog() })
+          return
+        }
+
+        if (pathname === SHOWCASE_API.render) {
+          if (req.method !== 'POST') {
+            sendJson(res, 405, { error: 'Méthode non autorisée.' })
+            return
+          }
+
+          try {
+            const payload = await readJsonBody(req)
+            const componentId = typeof payload.componentId === 'string' ? payload.componentId : ''
+            const component = getShowcaseComponent(componentId)
+
+            if (!component) {
+              sendJson(res, 404, { error: `Composant inconnu : ${componentId || 'non renseigné'}.` })
+              return
+            }
+
+            const props = normalizeComponentProps(component.schema, payload.props)
+            const html = await renderTwig(component.twigPath, props)
+            sendJson(res, 200, {
+              html,
+              component: {
+                id: component.id,
+                name: component.schema.name,
+                level: component.schema.level
+              },
+              props
+            })
+          } catch (error) {
+            sendJson(res, 422, { error: error.message })
+          }
+          return
+        }
 
         if (pathname.startsWith('/sketches/')) {
           const relativePath = decodeURIComponent(pathname.replace('/sketches/', ''))
@@ -207,9 +270,17 @@ function openUIPlugin() {
       })
     },
 
-    // HMR : rechargement complet sur changement .twig ou esquisse
+    // HMR : rechargement complet sur changement de contrat/rendu ou esquisse.
     handleHotUpdate({ file, server }) {
-      if (file.endsWith('.twig') || file.includes(`${path.sep}dev${path.sep}sketches${path.sep}`)) {
+      const isProjectContract = file.includes(`${path.sep}dev${path.sep}`) && /\.(twig|json)$/.test(file)
+      const isSketch = file.includes(`${path.sep}dev${path.sep}sketches${path.sep}`)
+      const isProjectStylesheet = path.resolve(file) === PROJECT_STYLESHEET
+
+      if (isProjectContract || isSketch || isProjectStylesheet) {
+        if (isProjectStylesheet) {
+          const stylesheetModule = server.moduleGraph.getModuleById(RESOLVED_PROJECT_STYLESHEET_ID)
+          if (stylesheetModule) server.moduleGraph.invalidateModule(stylesheetModule)
+        }
         clearTimeout(fullReloadTimer)
         fullReloadTimer = setTimeout(() => {
           server.ws.send({ type: 'full-reload' })
