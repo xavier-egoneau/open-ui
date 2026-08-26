@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { getShowcaseCatalog, getShowcaseComponent, normalizeComponentProps } from './catalog.js'
+import {
+  getShowcaseCatalog,
+  getShowcaseComponent,
+  getShowcaseEntry,
+  normalizeComponentProps
+} from './catalog.js'
 
 const schema = {
   variants: {
@@ -93,8 +98,34 @@ describe('normalizeComponentProps', () => {
 })
 
 describe('empty workspace', () => {
-  it('expose un catalogue vide sans inventer de composant', () => {
-    expect(getShowcaseCatalog([])).toEqual([])
+  it('expose un catalogue vide sans inventer de composant ou de page', () => {
+    expect(getShowcaseCatalog({ components: [], pages: [] })).toEqual([])
     expect(getShowcaseComponent('button', [])).toBeNull()
+  })
+})
+
+describe('showcase entries', () => {
+  const component = {
+    id: 'shared',
+    mdPath: 'missing-component.md',
+    schema: { name: 'Shared component', level: 'atom', category: 'Actions' }
+  }
+  const page = {
+    id: 'shared',
+    mdPath: 'missing-page.md',
+    schema: { name: 'Shared page', category: 'Pages' }
+  }
+
+  it('catalogue les pages et les composants avec une identite non ambigue', () => {
+    expect(getShowcaseCatalog({ components: [component], pages: [page] })).toEqual([
+      expect.objectContaining({ id: 'shared', key: 'component:shared', type: 'component', level: 'atom' }),
+      expect.objectContaining({ id: 'shared', key: 'page:shared', type: 'page', level: 'page' })
+    ])
+  })
+
+  it('resout une entree dans la bonne collection', () => {
+    expect(getShowcaseEntry('component', 'shared', { components: [component], pages: [page] })).toBe(component)
+    expect(getShowcaseEntry('page', 'shared', { components: [component], pages: [page] })).toBe(page)
+    expect(getShowcaseEntry('unknown', 'shared', { components: [component], pages: [page] })).toBeNull()
   })
 })

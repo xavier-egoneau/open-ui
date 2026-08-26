@@ -15,11 +15,13 @@ Open UI est un workspace de design system agent-first. Le modele composant doit 
 - Le SCSS associe vit dans `dev/assets/scss/components/_[name].scss` et doit etre importe depuis `dev/assets/scss/style.scss`.
 - Un composant doit etre reutilise avant d'etre recree.
 - Modifier une page signifie souvent modifier un composant ou une configuration de composant, pas patcher la page directement.
+- Une page canonique vit dans `dev/pages/` avec au minimum `[name].json` et `[name].twig`. Elle utilise les mêmes groupes `variants` et `content` qu'un composant pour exposer ses variables dans le Showcase.
+- Le Showcase catalogue composants et pages. Une page y est rendue comme un document HTML complet afin de conserver sa langue, son titre, ses landmarks et sa structure globale pour les contrôles Axe et W3C.
 
 ## Démarrage à vide
 
 - `showcase/` appartient au moteur versionné et n'est pas généré par le workspace utilisateur.
-- `dev/` peut ne contenir que `.gitkeep`, ou être momentanément absent : la cartographie et le Showcase doivent alors retourner zéro composant sans échouer.
+- `dev/` peut ne contenir que `.gitkeep`, ou être momentanément absent : la cartographie et le Showcase doivent alors retourner zéro composant et zéro page sans échouer.
 - `dev/assets/scss/style.scss` devient nécessaire seulement lorsqu'un projet commence à définir ses styles ; le Showcase fournit une feuille vide avant sa création.
 - `public/` n'est jamais un prérequis : `npm run build` le crée comme sortie générée.
 

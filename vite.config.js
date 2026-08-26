@@ -3,7 +3,7 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import Twig from 'twig'
 import { SHOWCASE_API } from './showcase/shared/protocol.js'
-import { getShowcaseCatalog, getShowcaseComponent, normalizeComponentProps } from './showcase/server/catalog.js'
+import { getShowcaseCatalog, getShowcaseEntry, normalizeShowcaseProps } from './showcase/server/catalog.js'
 import { readJsonBody, sendJson } from './showcase/server/http.js'
 import { createProjectStylesheetSource } from './showcase/server/project-style.js'
 import { validateHtmlWithW3c } from './showcase/server/html-validator.js'
@@ -198,7 +198,14 @@ function openUIPlugin() {
             return
           }
 
-          sendJson(res, 200, { components: getShowcaseCatalog() })
+          const entries = getShowcaseCatalog()
+          sendJson(res, 200, {
+            entries,
+            counts: {
+              components: entries.filter((entry) => entry.type === 'component').length,
+              pages: entries.filter((entry) => entry.type === 'page').length
+            }
+          })
           return
         }
 
@@ -210,22 +217,25 @@ function openUIPlugin() {
 
           try {
             const payload = await readJsonBody(req)
-            const componentId = typeof payload.componentId === 'string' ? payload.componentId : ''
-            const component = getShowcaseComponent(componentId)
+            const entryType = typeof payload.entryType === 'string' ? payload.entryType : ''
+            const entryId = typeof payload.entryId === 'string' ? payload.entryId : ''
+            const entry = getShowcaseEntry(entryType, entryId)
 
-            if (!component) {
-              sendJson(res, 404, { error: `Composant inconnu : ${componentId || 'non renseigné'}.` })
+            if (!entry) {
+              sendJson(res, 404, { error: `Entrée Showcase inconnue : ${entryType || 'type absent'}/${entryId || 'identifiant absent'}.` })
               return
             }
 
-            const props = normalizeComponentProps(component.schema, payload.props)
-            const html = await renderTwig(component.twigPath, props)
+            const props = normalizeShowcaseProps(entry.schema, payload.props)
+            const html = await renderTwig(entry.twigPath, props)
             sendJson(res, 200, {
               html,
-              component: {
-                id: component.id,
-                name: component.schema.name,
-                level: component.schema.level
+              entry: {
+                id: entry.id,
+                type: entryType,
+                key: `${entryType}:${entry.id}`,
+                name: entry.schema.name,
+                level: entryType === 'page' ? 'page' : entry.schema.level
               },
               props
             })
@@ -250,9 +260,10 @@ function openUIPlugin() {
 
             const result = await validateHtmlWithW3c(payload.html, {
               endpoint: process.env.OPENUI_W3C_VALIDATOR_URL,
-              title: typeof payload.componentName === 'string'
-                ? `Open UI — ${payload.componentName}`
-                : 'Open UI component'
+              fullDocument: payload.entryType === 'page',
+              title: typeof payload.entryName === 'string'
+                ? `Open UI — ${payload.entryName}`
+                : 'Open UI rendering'
             })
             sendJson(res, 200, result)
           } catch (error) {

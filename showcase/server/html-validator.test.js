@@ -40,4 +40,23 @@ describe('Nu HTML Checker adapter', () => {
     )
     expect(result).toEqual(expect.objectContaining({ external: false, errors: 1, warnings: 0 }))
   })
+
+  it('envoie une page complete sans ajouter un second document HTML', async () => {
+    const page = '<!doctype html><html lang="fr"><head><title>Page</title></head><body><main>Test</main></body></html>'
+    const fetchImplementation = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ messages: [] })
+    })
+
+    await validateHtmlWithW3c(page, {
+      endpoint: 'http://localhost:8888/',
+      fullDocument: true,
+      fetchImplementation
+    })
+
+    expect(fetchImplementation).toHaveBeenCalledWith(
+      expect.any(URL),
+      expect.objectContaining({ body: page })
+    )
+  })
 })

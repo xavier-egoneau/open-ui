@@ -1,6 +1,8 @@
 # Open UI
 
-Open UI est un workspace de design system pensé pour être lu et manipulé autant par des développeurs que par des agents. Les composants sont décrits par un contrat JSON, rendus avec Twig, stylés en SCSS et consultables dans un Showcase interactif.
+![alt text](image.png)
+
+Open UI est un workspace de design system pensé pour être lu et manipulé autant par des développeurs que par des agents. Les composants et les pages sont décrits par un contrat JSON, rendus avec Twig, stylés en SCSS et consultables dans un Showcase interactif.
 
 Le projet peut démarrer sans aucun composant : `dev/` peut être vide et `public/` absent. Le Showcase reste disponible et présente alors un état de démarrage explicite.
 
@@ -38,7 +40,7 @@ Aucune commande d’initialisation n’est nécessaire. Le moteur du Showcase es
 
 - `dev/` est la racine structurelle des sources projet. Le dépôt conserve `dev/.gitkeep`, mais son contenu est actuellement ignoré par Git.
 - `public/` est une sortie générée. Vite le crée automatiquement pendant le build.
-- `showcase/` contient l’outil système : catalogue, inspecteur de propriétés, iframe de rendu et affichage du HTML courant.
+- `showcase/` contient l’outil système : catalogue des composants et pages, inspecteur de propriétés, iframe de rendu et affichage du HTML courant.
 - La feuille `dev/assets/scss/style.scss` est facultative au départ. Le Showcase utilise une feuille vide tant qu’elle n’existe pas, puis charge automatiquement les styles du projet lorsqu’elle est créée.
 
 Un workspace sans composant n’est donc pas une erreur : le catalogue affiche `0` et guide la création du premier composant.
@@ -65,12 +67,14 @@ Le JSON décrit les métadonnées, variantes et contenus modifiables. Le Showcas
 
 Le contrat complet est documenté dans [GUIDELINES_AI.md](./GUIDELINES_AI.md) et [docs/component-model.md](./docs/component-model.md).
 
+Une page suit le même principe dans `dev/pages/` : `[nom].json` expose ses variantes et contenus, tandis que `[nom].twig` produit un document HTML complet. Le Showcase la présente dans une section `Pages` distincte et rerend le document à chaque modification.
+
 ## Contrôler la qualité du rendu
 
-Dans le Showcase, Axe analyse automatiquement chaque nouveau rendu après une courte temporisation. Le bouton `Contrôler le rendu` relance Axe et ajoute la validation HTML W3C sur la variante actuellement affichée :
+Dans le Showcase, Axe analyse automatiquement chaque nouveau rendu après une courte temporisation. Le bouton `Contrôler le rendu` relance Axe et ajoute la validation HTML W3C sur la variante de composant ou de page actuellement affichée :
 
-- **Nu HTML Checker** contrôle la conformité du fragment dans un document HTML minimal ;
-- **Axe** contrôle localement les règles d’accessibilité automatisables dans l’iframe, sans envoyer le DOM à un service externe.
+- **Nu HTML Checker** contrôle un composant dans un document HTML minimal ou une page comme document complet ;
+- **Axe** contrôle localement les règles d’accessibilité automatisables dans l’iframe, y compris la structure globale lorsqu'une page est sélectionnée, sans envoyer le DOM à un service externe.
 
 Le panneau conserve séparément les erreurs HTML, les violations Axe et les vérifications RGAA manuelles. Un résultat sans erreur est formulé `Aucune erreur automatique détectée` : il ne constitue jamais une preuve de conformité RGAA.
 

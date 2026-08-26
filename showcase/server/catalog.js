@@ -1,20 +1,34 @@
 import fs from 'fs'
-import { getComponentEntries } from '../../scripts/design-system.js'
+import { getComponentEntries, getPageEntries } from '../../scripts/design-system.js'
 
 const CONTROL_GROUPS = ['variants', 'content']
 
-export function getShowcaseCatalog(components = getComponentEntries()) {
-  return components.map((component) => ({
-    id: component.id,
-    ...component.schema,
-    documentation: fs.existsSync(component.mdPath)
-      ? fs.readFileSync(component.mdPath, 'utf8')
-      : ''
-  }))
+export function getShowcaseCatalog(sources = {}) {
+  const components = sources.components ?? getComponentEntries()
+  const pages = sources.pages ?? getPageEntries()
+
+  return [
+    ...components.map((component) => createCatalogEntry(component, 'component')),
+    ...pages.map((page) => createCatalogEntry(page, 'page'))
+  ]
 }
 
 export function getShowcaseComponent(componentId, components = getComponentEntries()) {
   return components.find((component) => component.id === componentId) ?? null
+}
+
+export function getShowcaseEntry(entryType, entryId, sources = {}) {
+  const entries = entryType === 'page'
+    ? sources.pages ?? getPageEntries()
+    : entryType === 'component'
+      ? sources.components ?? getComponentEntries()
+      : []
+
+  return entries.find((entry) => entry.id === entryId) ?? null
+}
+
+export function normalizeShowcaseProps(schema, submittedProps = {}) {
+  return normalizeComponentProps(schema, submittedProps)
 }
 
 export function normalizeComponentProps(schema, submittedProps = {}) {
@@ -76,4 +90,17 @@ function normalizeArrayItem(itemSchema, value) {
   }
 
   return normalizeControlValue(itemSchema, value)
+}
+
+function createCatalogEntry(entry, type) {
+  return {
+    ...entry.schema,
+    id: entry.id,
+    key: `${type}:${entry.id}`,
+    type,
+    level: type === 'page' ? 'page' : entry.schema.level,
+    documentation: entry.mdPath && fs.existsSync(entry.mdPath)
+      ? fs.readFileSync(entry.mdPath, 'utf8')
+      : ''
+  }
 }

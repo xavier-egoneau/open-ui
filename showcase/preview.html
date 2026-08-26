@@ -8,8 +8,14 @@
 </head>
 <body class="preview-document" data-background="light">
   <main class="preview-stage" id="preview-stage">
-    <p class="preview-placeholder" id="preview-placeholder">Sélectionnez un composant dans le Showcase.</p>
+    <p class="preview-placeholder" id="preview-placeholder">Sélectionnez un composant ou une page dans le Showcase.</p>
     <div class="preview-mount" id="preview-root" aria-busy="false"></div>
+    <iframe
+      class="page-preview"
+      id="page-preview"
+      title="Prévisualisation de la page sélectionnée"
+      hidden
+    ></iframe>
     <div class="preview-error" id="preview-error" role="alert" hidden></div>
   </main>
 

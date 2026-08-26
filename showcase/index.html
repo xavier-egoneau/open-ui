@@ -27,13 +27,13 @@
       <div class="catalog__header">
         <div>
           <p class="section-kicker">Bibliothèque</p>
-          <h2 id="catalog-title">Composants</h2>
+          <h2 id="catalog-title">Composants et pages</h2>
         </div>
         <p class="catalog__count" id="catalog-count">0</p>
       </div>
 
       <div class="catalog__search">
-        <label class="visually-hidden" for="component-search">Rechercher un composant</label>
+        <label class="visually-hidden" for="component-search">Rechercher un composant ou une page</label>
         <input id="component-search" type="search" placeholder="Rechercher…" autocomplete="off" disabled>
       </div>
 
@@ -43,9 +43,9 @@
     <main class="canvas" id="showcase-main" tabindex="-1">
       <header class="canvas__toolbar">
         <div class="canvas__identity">
-          <p class="canvas__meta" id="component-meta">Sélectionnez un composant</p>
+          <p class="canvas__meta" id="component-meta">Sélectionnez un composant ou une page</p>
           <h2 id="component-title">Prévisualisation</h2>
-          <p class="canvas__description" id="component-description">Le composant sera rendu seul dans une iframe isolée.</p>
+          <p class="canvas__description" id="component-description">Le rendu sera isolé dans une iframe et piloté par son contrat JSON.</p>
           <div class="quality-badges" aria-label="État des contrôles du rendu">
             <span class="quality-badge" id="w3c-badge" data-status="idle">HTML · non testé</span>
             <span class="quality-badge" id="axe-badge" data-status="idle">Axe · non testé</span>
@@ -81,15 +81,15 @@
       <div class="canvas__surface" id="canvas-surface">
         <section class="workspace-empty" id="workspace-empty" aria-labelledby="workspace-empty-title">
           <p class="section-kicker">Workspace prêt</p>
-          <h3 id="workspace-empty-title">Commencez par votre premier composant.</h3>
-          <p id="workspace-empty-description">Le Showcase fonctionne déjà. Ajoutez ensuite le contrat JSON, le template Twig et la documentation du composant.</p>
-          <code>dev/components/[nom]/</code>
+          <h3 id="workspace-empty-title">Commencez par votre premier composant ou votre première page.</h3>
+          <p id="workspace-empty-description">Le Showcase fonctionne déjà. Ajoutez ensuite un contrat JSON et son template Twig.</p>
+          <code>dev/components/[nom]/ ou dev/pages/[nom].*</code>
         </section>
 
         <div class="preview-shell" id="preview-shell" hidden>
           <iframe
             id="preview-frame"
-            title="Prévisualisation du composant sélectionné"
+            title="Prévisualisation de l'entrée sélectionnée"
             src="./preview.html"
           ></iframe>
         </div>
@@ -108,7 +108,7 @@
               <button id="copy-html" type="button" disabled>Copier le HTML</button>
             </div>
           </div>
-          <pre id="html-output-pre" tabindex="0" aria-labelledby="html-output-title" aria-busy="true"><code id="html-output-code">Sélectionnez un composant pour générer son HTML.</code></pre>
+          <pre id="html-output-pre" tabindex="0" aria-labelledby="html-output-title" aria-busy="true"><code id="html-output-code">Sélectionnez un composant ou une page pour générer son HTML.</code></pre>
         </div>
       </details>
 
@@ -144,6 +144,7 @@
               <p class="quality-result__summary">Les contrôles automatiques ne prouvent pas la conformité RGAA.</p>
               <ul>
                 <li>Parcours clavier et visibilité du focus.</li>
+                <li>Sur une page : langue, titre, landmarks, titres et lien d'évitement.</li>
                 <li>Restitution avec les technologies d’assistance.</li>
                 <li>Pertinence des libellés, alternatives et messages.</li>
                 <li>Comportement en zoom, reflow et contextes réels.</li>
@@ -169,7 +170,7 @@
       </header>
 
       <form class="inspector__form" id="controls-form">
-        <p class="inspector__empty" id="inspector-empty">Aucun composant à configurer pour le moment.</p>
+        <p class="inspector__empty" id="inspector-empty">Aucun composant ou page à configurer pour le moment.</p>
         <div id="controls-container"></div>
         <div id="composition-container"></div>
       </form>

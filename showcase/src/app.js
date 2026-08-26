@@ -3,8 +3,9 @@ import { getComponentDefaults, renderComposition, renderControls } from './contr
 import { summarizeQualityReport } from './quality-state.js'
 import { isCurrentRender, normalizeRenderedHtml } from './render-state.js'
 
-const LEVEL_ORDER = ['atom', 'molecule', 'organism', 'template']
+const LEVEL_ORDER = ['page', 'atom', 'molecule', 'organism', 'template']
 const LEVEL_LABELS = {
+  page: 'Pages',
   atom: 'Atoms',
   molecule: 'Molécules',
   organism: 'Organismes',
@@ -51,7 +52,7 @@ const elements = {
 }
 
 const state = {
-  components: [],
+  entries: [],
   selected: null,
   props: {},
   previewReady: false,
@@ -65,7 +66,7 @@ const state = {
 }
 
 elements.search.addEventListener('input', () => renderCatalog(elements.search.value))
-elements.reset.addEventListener('click', resetSelectedComponent)
+elements.reset.addEventListener('click', resetSelectedEntry)
 elements.background.addEventListener('change', sendPreviewSettings)
 elements.previewFrame.addEventListener('load', connectPreview)
 elements.copyHtml.addEventListener('click', copyRenderedHtml)
@@ -89,17 +90,19 @@ async function loadCatalog() {
     const payload = await response.json()
     if (!response.ok) throw new Error(payload.error ?? 'Catalogue indisponible.')
 
-    state.components = payload.components ?? []
-    elements.catalogCount.textContent = String(state.components.length)
-    elements.catalogStatus.textContent = `${state.components.length} composants chargés`
+    state.entries = payload.entries ?? []
+    elements.catalogCount.textContent = String(state.entries.length)
+    const componentsCount = payload.counts?.components ?? state.entries.filter((entry) => entry.type === 'component').length
+    const pagesCount = payload.counts?.pages ?? state.entries.filter((entry) => entry.type === 'page').length
+    elements.catalogStatus.textContent = `${componentsCount} composant${componentsCount > 1 ? 's' : ''} · ${pagesCount} page${pagesCount > 1 ? 's' : ''}`
     renderCatalog('')
 
-    if (!state.components.length) {
+    if (!state.entries.length) {
       showEmptyWorkspace()
       return
     }
 
-    enableComponentWorkspace()
+    enableEntryWorkspace()
     selectFromHash()
   } catch (error) {
     elements.catalogStatus.textContent = 'Showcase indisponible'
@@ -111,8 +114,8 @@ async function loadCatalog() {
 
 function renderCatalog(query) {
   const normalizedQuery = query.trim().toLocaleLowerCase('fr')
-  const filtered = state.components.filter((component) => {
-    const haystack = [component.name, component.id, component.category, component.description]
+  const filtered = state.entries.filter((entry) => {
+    const haystack = [entry.name, entry.id, entry.type, entry.category, entry.description]
       .filter(Boolean)
       .join(' ')
       .toLocaleLowerCase('fr')
@@ -122,22 +125,22 @@ function renderCatalog(query) {
   elements.componentList.replaceChildren()
 
   if (!filtered.length) {
-    const message = state.components.length
-      ? 'Aucun composant ne correspond à cette recherche.'
-      : 'Aucun composant dans dev/components pour le moment.'
+    const message = state.entries.length
+      ? 'Aucun composant ou page ne correspond à cette recherche.'
+      : 'Aucun composant dans dev/components ni page dans dev/pages pour le moment.'
     elements.componentList.append(createMessage(message, 'catalog__empty'))
     return
   }
 
   const grouped = new Map()
   for (const level of LEVEL_ORDER) grouped.set(level, [])
-  for (const component of filtered) {
-    if (!grouped.has(component.level)) grouped.set(component.level, [])
-    grouped.get(component.level).push(component)
+  for (const entry of filtered) {
+    if (!grouped.has(entry.level)) grouped.set(entry.level, [])
+    grouped.get(entry.level).push(entry)
   }
 
-  for (const [level, components] of grouped) {
-    if (!components.length) continue
+  for (const [level, entries] of grouped) {
+    if (!entries.length) continue
 
     const section = document.createElement('section')
     section.className = 'catalog-group'
@@ -145,22 +148,22 @@ function renderCatalog(query) {
     title.textContent = LEVEL_LABELS[level] ?? level
     const list = document.createElement('ul')
 
-    for (const component of components.sort((a, b) => a.name.localeCompare(b.name, 'fr'))) {
+    for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name, 'fr'))) {
       const item = document.createElement('li')
       const button = document.createElement('button')
       button.className = 'component-button'
       button.type = 'button'
-      button.dataset.componentId = component.id
-      button.setAttribute('aria-pressed', component.id === state.selected?.id ? 'true' : 'false')
-      button.addEventListener('click', () => selectComponent(component.id))
+      button.dataset.entryKey = entry.key
+      button.setAttribute('aria-pressed', entry.key === state.selected?.key ? 'true' : 'false')
+      button.addEventListener('click', () => selectEntry(entry.key))
 
       const name = document.createElement('span')
       name.className = 'component-button__name'
-      name.textContent = component.name
+      name.textContent = entry.name
       const category = document.createElement('span')
       category.className = 'component-button__category'
-      category.textContent = component.category
-      const qualitySummary = summarizeQualityReport(state.qualityReports.get(component.id))
+      category.textContent = entry.type === 'page' ? 'Page complète' : entry.category
+      const qualitySummary = summarizeQualityReport(state.qualityReports.get(entry.key))
       const quality = document.createElement('span')
       quality.className = 'component-button__quality'
       quality.dataset.status = qualitySummary.status
@@ -181,37 +184,39 @@ function renderCatalog(query) {
 }
 
 function selectFromHash() {
-  if (!state.components.length) return
+  if (!state.entries.length) return
   const requested = decodeURIComponent(location.hash.replace(/^#/, ''))
-  const component = state.components.find((entry) => entry.id === requested) ?? state.components[0]
-  if (component.id !== state.selected?.id) selectComponent(component.id, false)
+  const entry = state.entries.find((candidate) => candidate.key === requested)
+    ?? state.entries.find((candidate) => candidate.type === 'component' && candidate.id === requested)
+    ?? state.entries[0]
+  if (entry.key !== state.selected?.key) selectEntry(entry.key, false)
 }
 
-function selectComponent(componentId, updateHash = true) {
-  const component = state.components.find((entry) => entry.id === componentId)
-  if (!component) return
+function selectEntry(entryKey, updateHash = true) {
+  const entry = state.entries.find((candidate) => candidate.key === entryKey)
+  if (!entry) return
 
-  state.selected = component
-  state.props = getComponentDefaults(component)
-  enableComponentWorkspace()
+  state.selected = entry
+  state.props = getComponentDefaults(entry)
+  enableEntryWorkspace()
 
-  if (updateHash) history.replaceState(null, '', `#${encodeURIComponent(component.id)}`)
+  if (updateHash) history.replaceState(null, '', `#${encodeURIComponent(entry.key)}`)
 
-  elements.componentMeta.textContent = `${component.level} · ${component.category} · ${component.id}`
-  elements.componentTitle.textContent = component.name
-  elements.componentDescription.textContent = component.description
-  elements.previewFrame.title = `Prévisualisation du composant ${component.name}`
+  elements.componentMeta.textContent = `${entry.type === 'page' ? 'page' : entry.level} · ${entry.category} · ${entry.id}`
+  elements.componentTitle.textContent = entry.name
+  elements.componentDescription.textContent = entry.description
+  elements.previewFrame.title = `Prévisualisation de ${entry.type === 'page' ? 'la page' : 'du composant'} ${entry.name}`
   elements.empty.hidden = true
   elements.reset.disabled = false
 
-  renderControls(elements.controls, component, state.props, updateProp)
-  renderComposition(elements.composition, component)
+  renderControls(elements.controls, entry, state.props, updateProp)
+  renderComposition(elements.composition, entry)
   updatePropsOutput()
   renderCatalog(elements.search.value)
   scheduleRender(true)
 }
 
-function enableComponentWorkspace() {
+function enableEntryWorkspace() {
   elements.search.disabled = false
   elements.viewportPicker.disabled = false
   elements.background.disabled = false
@@ -226,18 +231,18 @@ function showEmptyWorkspace() {
   elements.background.disabled = true
   elements.workspaceEmpty.hidden = false
   elements.previewShell.hidden = true
-  elements.workspaceEmptyTitle.textContent = 'Commencez par votre premier composant.'
-  elements.workspaceEmptyDescription.textContent = 'Le Showcase est opérationnel sans source projet. Ajoutez un contrat JSON, un template Twig et sa documentation quand vous êtes prêt.'
-  elements.componentMeta.textContent = 'Workspace · 0 composant'
+  elements.workspaceEmptyTitle.textContent = 'Commencez par votre premier composant ou votre première page.'
+  elements.workspaceEmptyDescription.textContent = 'Le Showcase est opérationnel sans source projet. Ajoutez un contrat JSON et un template Twig quand vous êtes prêt.'
+  elements.componentMeta.textContent = 'Workspace · 0 entrée'
   elements.componentTitle.textContent = 'Design system prêt à démarrer'
   elements.componentDescription.textContent = 'dev/ peut rester vide au début du projet.'
   elements.empty.hidden = false
-  elements.empty.textContent = 'Les variables apparaîtront ici dès qu’un composant sera ajouté.'
+  elements.empty.textContent = 'Les variables apparaîtront ici dès qu’un composant ou une page sera ajouté.'
   elements.renderStatus.textContent = 'Aucun rendu à générer.'
-  elements.htmlStatus.textContent = 'Aucun composant'
+  elements.htmlStatus.textContent = 'Aucune entrée'
   elements.htmlPre.setAttribute('aria-busy', 'false')
-  elements.htmlCode.textContent = '<!-- Ajoutez un composant pour générer son HTML. -->'
-  resetQualityPanel('Aucun composant à contrôler.')
+  elements.htmlCode.textContent = '<!-- Ajoutez un composant ou une page pour générer son HTML. -->'
+  resetQualityPanel('Aucun rendu à contrôler.')
 }
 
 function showWorkspaceError(message) {
@@ -258,7 +263,7 @@ function updateProp(key, value) {
   scheduleRender(false)
 }
 
-function resetSelectedComponent() {
+function resetSelectedEntry() {
   if (!state.selected) return
   state.props = getComponentDefaults(state.selected)
   forgetSelectedQualityReport()
@@ -292,7 +297,8 @@ function sendRender() {
   elements.previewFrame.contentWindow.postMessage({
     source: SHOWCASE_SOURCE,
     type: SHOWCASE_MESSAGES.render,
-    componentId: state.selected.id,
+    entryType: state.selected.type,
+    entryId: state.selected.id,
     props: state.props,
     revision: state.renderRevision
   }, location.origin)
@@ -312,7 +318,7 @@ function updateRenderedHtml(html) {
   state.renderedHtml = normalizeRenderedHtml(html)
   elements.htmlStatus.textContent = 'À jour'
   elements.htmlPre.setAttribute('aria-busy', 'false')
-  elements.htmlCode.textContent = state.renderedHtml || '<!-- Le composant ne produit aucun HTML. -->'
+  elements.htmlCode.textContent = state.renderedHtml || '<!-- Le rendu ne produit aucun HTML. -->'
   elements.copyHtml.disabled = !state.renderedHtml
   elements.copyHtmlStatus.textContent = ''
   elements.qualityButton.disabled = !state.renderedHtml
@@ -320,7 +326,7 @@ function updateRenderedHtml(html) {
 
 function forgetSelectedQualityReport() {
   if (!state.selected) return
-  if (state.qualityReports.delete(state.selected.id)) renderCatalog(elements.search.value)
+  if (state.qualityReports.delete(state.selected.key)) renderCatalog(elements.search.value)
 }
 
 function resetQualityPanel(message = 'Lancez les contrôles sur le rendu courant.') {
@@ -333,7 +339,9 @@ function resetQualityPanel(message = 'Lancez les contrôles sur le rendu courant
   setQualityBadge(elements.w3cBadge, 'idle', 'HTML · non testé')
   setQualityBadge(elements.axeBadge, 'idle', 'Axe · non testé')
   elements.w3cSummary.textContent = 'Lancez le contrôle sur le HTML actuellement rendu.'
-  elements.axeSummary.textContent = 'L’analyse porte uniquement sur la variante affichée.'
+  elements.axeSummary.textContent = state.selected?.type === 'page'
+    ? 'L’analyse porte sur le document complet de la page affichée.'
+    : 'L’analyse porte uniquement sur la variante affichée.'
   elements.w3cResults.replaceChildren()
   elements.axeResults.replaceChildren()
 }
@@ -345,15 +353,16 @@ function runQualityChecks() {
 
   const report = {
     id: ++state.qualityRunId,
-    componentId: state.selected.id,
-    componentName: state.selected.name,
+    entryKey: state.selected.key,
+    entryType: state.selected.type,
+    entryName: state.selected.name,
     revision: state.renderRevision,
     w3c: { status: 'pending' },
     axe: { status: 'pending' }
   }
 
   state.activeQualityRun = report
-  state.qualityReports.set(report.componentId, report)
+  state.qualityReports.set(report.entryKey, report)
   elements.qualityOutput.open = true
   elements.qualityPanel.setAttribute('aria-busy', 'true')
   elements.qualityButton.disabled = true
@@ -372,15 +381,16 @@ function scheduleAutomaticAxeCheck() {
 
   const report = {
     id: ++state.qualityRunId,
-    componentId: state.selected.id,
-    componentName: state.selected.name,
+    entryKey: state.selected.key,
+    entryType: state.selected.type,
+    entryName: state.selected.name,
     revision: state.renderRevision,
     w3c: { status: 'idle' },
     axe: { status: 'pending' }
   }
 
   state.activeQualityRun = report
-  state.qualityReports.set(report.componentId, report)
+  state.qualityReports.set(report.entryKey, report)
   elements.qualityPanel.setAttribute('aria-busy', 'true')
   elements.qualityButton.disabled = true
   elements.qualityLive.textContent = 'Analyse Axe locale en cours…'
@@ -409,7 +419,8 @@ async function runW3cCheck(report) {
       },
       body: JSON.stringify({
         html: state.renderedHtml,
-        componentName: report.componentName
+        entryType: report.entryType,
+        entryName: report.entryName
       })
     })
     const payload = await response.json()
@@ -427,7 +438,7 @@ async function runW3cCheck(report) {
 function isActiveQualityRun(report) {
   return state.activeQualityRun?.id === report.id
     && state.renderRevision === report.revision
-    && state.selected?.id === report.componentId
+    && state.selected?.key === report.entryKey
 }
 
 function renderQualityReport(report) {
@@ -438,7 +449,7 @@ function renderQualityReport(report) {
 
   const summary = summarizeQualityReport(report)
   elements.qualityStatus.textContent = summary.label
-  state.qualityReports.set(report.componentId, report)
+  state.qualityReports.set(report.entryKey, report)
 
   const pending = report.w3c.status === 'pending' || report.axe.status === 'pending'
   if (pending) return
@@ -461,7 +472,9 @@ function renderW3cState(check) {
 
   if (check.status === 'pending') {
     setQualityBadge(elements.w3cBadge, 'pending', 'HTML · contrôle…')
-    elements.w3cSummary.textContent = 'Validation du document encapsulant le composant…'
+    elements.w3cSummary.textContent = state.selected?.type === 'page'
+      ? 'Validation du document HTML complet…'
+      : 'Validation du document encapsulant le composant…'
     elements.w3cResults.replaceChildren()
     return
   }
@@ -553,7 +566,8 @@ function renderAxeIssues(violations = [], incomplete = []) {
   ]
 
   if (!issues.length) {
-    elements.axeResults.append(createQualityMessage('Axe n’a trouvé aucune violation dans la variante affichée.'))
+    const scope = state.selected?.type === 'page' ? 'la page affichée' : 'la variante affichée'
+    elements.axeResults.append(createQualityMessage(`Axe n’a trouvé aucune violation dans ${scope}.`))
     return
   }
 

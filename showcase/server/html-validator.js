@@ -35,7 +35,9 @@ export function normalizeW3cMessages(payload = {}) {
 
 export async function validateHtmlWithW3c(html, options = {}) {
   const endpoint = resolveValidatorUrl(options.endpoint)
-  const document = createValidationDocument(html, options.title)
+  const document = options.fullDocument
+    ? String(html)
+    : createValidationDocument(html, options.title)
   const fetchImplementation = options.fetchImplementation ?? fetch
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), options.timeout ?? 12_000)

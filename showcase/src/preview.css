@@ -13,6 +13,11 @@
   transition: background-color 150ms ease;
 }
 
+.preview-document[data-entry-type="page"] .preview-stage {
+  display: block;
+  padding: 0;
+}
+
 .preview-document[data-background="grid"] .preview-stage {
   background-color: #f8f7f3;
   background-image:
@@ -28,6 +33,18 @@
 .preview-mount {
   width: 100%;
   min-width: 0;
+}
+
+.page-preview {
+  display: block;
+  width: 100%;
+  min-height: 45rem;
+  border: 0;
+  background: #fff;
+}
+
+.page-preview[hidden] {
+  display: none;
 }
 
 .preview-mount[data-level="atom"] {

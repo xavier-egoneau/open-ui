@@ -51,6 +51,7 @@ export function getPageEntries() {
       dir,
       jsonPath,
       twigPath: path.join(dir, `${id}.twig`),
+      mdPath: path.join(dir, `${id}.md`),
       scssPath: path.join(SCSS_DIR, 'components', `_${id}-page.scss`),
       schema: readJson(jsonPath)
     }
