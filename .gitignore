@@ -8,3 +8,4 @@ dev/*
 .env.*
 !.env.example
 .openui-empty-*/
+.openui/graph.json

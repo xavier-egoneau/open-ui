@@ -38,6 +38,7 @@ L'effort premier porte sur la structure durable du projet : comprendre les compo
 - `docs/design-tokens.md` : règles tokens/design system.
 - `docs/project-workspaces.md` : cible multi-projets.
 - `docs/sketches.md` : différence esquisse vs composant canonique et tunnel maquette libre.
+- `.openui/graph.json` : index local compact des composants, pages, relations transitives et statuts ; le régénérer avec `npm run graph`, ne jamais l'éditer directement.
 - `skill-src/skills/rgaa/` : revue RGAA generaliste pour composants, pages, formulaires, navigation et interactions.
 - `skill-src/skills/figma-to-open-ui/` : sas en deux phases entre une maquette Figma finalisée et son implémentation canonique approuvée.
 - `skill-src/skills/design-sketching/` : divergence créative en mode esquisse.
@@ -49,6 +50,7 @@ L'effort premier porte sur la structure durable du projet : comprendre les compo
 ## Principes non négociables
 
 - Comprendre avant d'écrire : lire les fichiers concernés, les docs utiles et les scripts existants.
+- Pour cartographier, lire d'abord `.openui/graph.json`, lancer `npm run graph:check` et ne charger ensuite que les fichiers des nœuds concernés.
 - Avant toute implémentation, se demander explicitement : "ai-je toutes les informations nécessaires pour réaliser cette tâche correctement ?" Si non, poser les précisions minimales avant de produire.
 - Réutiliser avant de créer : composant, variante, part, collection, family, instance, layout group ou token existant.
 - Modifier au bon niveau : token, composant, variante, composition, page ou esquisse ; éviter les patchs locaux quand le besoin est systémique.
@@ -129,12 +131,12 @@ Avant d'écrire, surtout si la demande est peu cadrée, touche un composant part
 1. Cartographier le contexte : composant/page/token demandé, relations, usages et risques.
 2. Lire les sources concernées : `.twig`, `.json`, `.md`, SCSS, page utilisatrice, docs pertinentes.
 3. Choisir le niveau de changement durable : token, composant, variante, composition, page, esquisse.
-4. Modifier de façon minimale mais cohérente avec le design system.
+4. Si la cible est une page ou un composant, la marquer `in-progress` dans son JSON, puis modifier de façon minimale mais cohérente avec le design system.
 5. Vérifier impacts et usages.
 6. Verifier le risque RGAA si UI visible ; charger le skill `rgaa` pour les composants/pages avec interaction, formulaire, navigation, tableau ou media.
 7. Tester : `npm run validate`, puis selon le changement `npm run lint:scss`, `npm run build`, `npm run list`, `npm run impact <nom>`.
 8. Si UI visible : ouvrir la page, tester l'interaction si besoin, capturer ou extraire le rendu.
-9. Répondre avec : changements, impacts, validations, preuve visuelle si pertinente, risques/restes.
+9. Pour une page ou un composant, passer la cible à `done` seulement si les vérifications attendues sont réussies, puis répondre avec : changements, impacts, validations, preuve visuelle si pertinente, risques/restes.
 
 ## Relecture visuelle obligatoire
 

@@ -95,6 +95,7 @@ Si le service Nu est indisponible, le Showcase affiche un contrôle HTML partiel
 
 ```text
 open-ui/
+|- .openui/      index local compact et analyses de travail
 |- dev/          sources locales du projet utilisateur
 |- showcase/     application système versionnée
 |- scripts/      validation, cartographie, impact et génération
@@ -111,10 +112,12 @@ Le Showcase ne réécrit jamais les JSON : les modifications faites dans son for
 |---|---|
 | `npm run dev` | Lance Vite, le Showcase et les mises à jour live |
 | `npm run build` | Génère le rendu dans `public/` |
-| `npm run validate` | Valide les contrats JSON, y compris un workspace vide |
+| `npm run validate` | Valide les contrats JSON et régénère l’index local |
 | `npm run test` | Lance les tests automatisés |
 | `npm run test:empty` | Construit une copie temporaire sans `dev/` ni `public/` |
 | `npm run lint:scss` | Vérifie les sources SCSS présentes |
+| `npm run graph` | Régénère `.openui/graph.json` |
+| `npm run graph:check` | Vérifie que l’index correspond aux sources |
 | `npm run list` | Liste les composants et les pages détectés |
 | `npm run impact -- <composant>` | Cartographie les usages d’un composant |
 | `npm run skills:build -- --target codex` | Génère uniquement les skills du harnais demandé |
@@ -122,6 +125,8 @@ Le Showcase ne réécrit jamais les JSON : les modifications faites dans son for
 | `npm run clean` | Supprime la sortie générée `public/` |
 
 `npm run build` remplace le contenu existant de `public/`. Ce dossier est ignoré par Git pendant le développement actuel ; lorsqu’il deviendra un livrable de production versionné, il faudra retirer sa règle du `.gitignore`.
+
+`.openui/graph.json` est un index local généré, compact et ignoré par Git. Il donne aux agents les relations composants/pages et leur statut sans charger tous les JSON et Twig. Les JSON restent les sources de vérité ; `MEMORY.md` reste la source des décisions projet.
 
 ## Principes du projet
 

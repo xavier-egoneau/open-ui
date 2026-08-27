@@ -18,6 +18,22 @@ Open UI est un workspace de design system agent-first. Le modele composant doit 
 - Une page canonique vit dans `dev/pages/` avec au minimum `[name].json` et `[name].twig`. Elle utilise les mêmes groupes `variants` et `content` qu'un composant pour exposer ses variables dans le Showcase.
 - Le Showcase catalogue composants et pages. Une page y est rendue comme un document HTML complet afin de conserver sa langue, son titre, ses landmarks et sa structure globale pour les contrôles Axe et W3C.
 
+## Index persistant
+
+- `.openui/graph.json` est l'index local généré des composants et pages ; il n'est pas une seconde source de vérité.
+- Les JSON et les `include` Twig alimentent l'index.
+- Chaque composant expose ses dépendances directes (`uses`), ses parents directs (`usedBy`) et toutes les pages qui le contiennent directement ou indirectement (`pages`).
+- Chaque page expose tous les composants qu'elle contient, y compris par composition transitive.
+- Le fichier reste compact, déterministe et ignoré par Git afin d'être lu rapidement par un agent.
+- `npm run validate` et `npm run graph` le régénèrent ; `npm run graph:check` détecte un index absent ou périmé.
+
+## Statut de travail
+
+- Un composant ou une page peut déclarer `status: "todo"`, `status: "in-progress"` ou `status: "done"` dans son JSON.
+- L'absence de statut vaut `done` pour la compatibilité avec les composants existants.
+- Une nouvelle cible passe à `in-progress` au début de son implémentation puis à `done` seulement après les vérifications attendues.
+- L'index agrège ces statuts, mais ne stocke pas les décisions : celles-ci restent dans `MEMORY.md`.
+
 ## Démarrage à vide
 
 - `showcase/` appartient au moteur versionné et n'est pas généré par le workspace utilisateur.

@@ -85,6 +85,7 @@ Exemple minimal valide :
 ```json
 {
   "name": "Button",
+  "status": "in-progress",
   "level": "atom",
   "category": "Forms",
   "description": "Element d'action interactif.",
@@ -113,6 +114,12 @@ Champs obligatoires :
 - `level` pour les composants dans `dev/components/`
 - `category`
 - `description`
+
+Statut de travail :
+- `status` accepte `todo`, `in-progress` ou `done`
+- l'absence de `status` vaut `done` pour compatibilite
+- declarer `in-progress` des le debut d'une creation ou refonte, puis `done` seulement apres validation, verification visuelle, responsive et accessibilite pertinentes
+- `.openui/graph.json` agrege les statuts et les relations ; ne pas l'editer a la main
 
 Types de controles disponibles :
 - `select` -> `{ type, label, default, options: [] }`

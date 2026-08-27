@@ -9,7 +9,7 @@ Open UI vise des resultats : l'agent doit comprendre le design system, modifier 
 Pour toute demande utilisateur, l'agent suit cette sequence :
 
 1. Comprendre l'intention produit, pas seulement les mots.
-2. Cartographier les composants/pages/tokens concernes.
+2. Lire `.openui/graph.json` pour cartographier les composants/pages concernés sans charger tout le projet ; lancer `npm run graph` s'il manque ou est périmé.
 3. Chercher une reutilisation ou une variante existante avant de creer.
 4. Choisir le niveau de modification : page, instance, composant, token ou convention.
 5. Annoncer les impacts si le changement est transversal.
@@ -24,6 +24,7 @@ Pour toute demande utilisateur, l'agent suit cette sequence :
 - Ne pas modifier un token sans annoncer l'impact transversal probable.
 - Ne pas casser le design system pour satisfaire un cas local.
 - Ne pas confondre maquette/esquisse et composant canonique.
+- Marquer `status: "in-progress"` dans le JSON d'une cible commencée, puis `done` seulement après les vérifications attendues.
 
 ## Entree Figma finalisee
 
@@ -48,6 +49,7 @@ Un composant canonique doit avoir JSON, Twig, Markdown et SCSS si necessaire. Un
 ## Verifications minimales
 
 - `npm run validate`
+- `npm run graph:check`
 - `npm run list` si la cartographie doit etre relue
 - `npm run impact -- <component>` si un composant est touche
 - `npm run lint:scss` si SCSS touche

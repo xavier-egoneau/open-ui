@@ -8,6 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "icons": "node scripts/generate-icons.js",
+    "graph": "node scripts/graph.js",
+    "graph:check": "node scripts/graph.js --check",
     "list": "node scripts/list-components.js",
     "validate": "node scripts/validate-json.js",
     "lint:scss": "stylelint \"dev/assets/scss/**/*.scss\" --allow-empty-input",

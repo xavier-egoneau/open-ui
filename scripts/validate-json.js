@@ -1,5 +1,11 @@
 import fs from 'fs'
-import { collectRefs, getComponentEntries, getPageEntries } from './design-system.js'
+import {
+  collectRefs,
+  DESIGN_SYSTEM_STATUSES,
+  getComponentEntries,
+  getPageEntries,
+  writeDesignSystemGraph
+} from './design-system.js'
 
 const errors = []
 const warnings = []
@@ -9,6 +15,7 @@ const componentIds = new Set(components.map((component) => component.id))
 const allowedControlTypes = new Set(['select', 'checkbox', 'text', 'color', 'number', 'array', 'component-params'])
 const allowedArrayItemTypes = new Set(['select', 'checkbox', 'text', 'color', 'number'])
 const allowedLevels = new Set(['atom', 'molecule', 'organism', 'template'])
+const allowedStatuses = new Set(DESIGN_SYSTEM_STATUSES)
 
 function fail(file, message) {
   errors.push(`${file}: ${message}`)
@@ -16,6 +23,12 @@ function fail(file, message) {
 
 function warn(file, message) {
   warnings.push(`${file}: ${message}`)
+}
+
+function validateStatus(file, status) {
+  if (status != null && !allowedStatuses.has(status)) {
+    fail(file, `unsupported status "${status}"`)
+  }
 }
 
 function validateArrayItem(file, controlPath, item) {
@@ -80,6 +93,7 @@ for (const component of components) {
   if (schema.level && !allowedLevels.has(schema.level)) fail(file, `unsupported level "${schema.level}"`)
   if (!schema.category) fail(file, 'missing category')
   if (!schema.description) fail(file, 'missing description')
+  validateStatus(file, schema.status)
   if (!fs.existsSync(component.twigPath)) fail(file, `missing twig file ${component.twigPath}`)
   if (!fs.existsSync(component.scssPath)) warn(file, `missing component scss ${component.scssPath}`)
   if (!fs.existsSync(component.mdPath)) warn(file, `missing component documentation ${component.mdPath}`)
@@ -99,6 +113,7 @@ for (const page of pages) {
   if (!schema.name) fail(file, 'missing name')
   if (!schema.category) warn(file, 'missing category')
   if (!schema.description) warn(file, 'missing description')
+  validateStatus(file, schema.status)
   if (!fs.existsSync(page.twigPath)) fail(file, `missing twig file ${page.twigPath}`)
 
   validateControls(file, 'variants', schema.variants ?? {})
@@ -121,8 +136,11 @@ if (errors.length) {
   process.exit(1)
 }
 
+const { changed: graphChanged } = writeDesignSystemGraph()
+
 if (!components.length && !pages.length) {
   console.log('Workspace empty: no components or pages to validate')
 } else {
   console.log(`JSON valid: ${components.length} components, ${pages.length} pages`)
 }
+console.log(`Open UI graph ${graphChanged ? 'updated' : 'current'}: .openui/graph.json`)

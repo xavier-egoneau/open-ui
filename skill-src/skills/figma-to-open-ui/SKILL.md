@@ -41,7 +41,7 @@ Utiliser cet artefact comme contrat entre les deux phases :
 1. Resoudre l'URL Figma vers le fichier, le node et la frame exacts. Si plusieurs cibles sont possibles, demander laquelle analyser.
 2. Obtenir le rendu de reference et les donnees disponibles : structure, composants/instances, variantes, auto-layout, contraintes, styles, assets, textes, etats, interactions et frames responsive.
 3. Identifier ce qui est explicitement present dans Figma et ce qui serait une inference. Ne pas transformer une absence de specification en decision certaine.
-4. Cartographier le design system Open UI avec les requetes les plus ciblees disponibles. Lire les JSON, Twig, Markdown et SCSS seulement pour les candidats pertinents.
+4. Vérifier `.openui/graph.json` avec `npm run graph:check`, le régénérer si nécessaire, puis cartographier le design system depuis cet index compact. Lire les JSON, Twig, Markdown et SCSS seulement pour les candidats pertinents.
 5. Classer chaque bloc significatif avec une seule decision provisoire :
    - `reuse` ;
    - `reuse-with-props` ;
@@ -72,7 +72,7 @@ Lorsqu'une reponse utilisateur confirme ou corrige l'analyse :
 1. Exiger le chemin ou l'identifiant d'un artefact `approved`. Ne pas se contenter d'une approbation supposee.
 2. Relire la cible Figma et recalculer la cartographie utile si le depot ou la maquette a change. Si le mapping n'est plus valable, remettre l'analyse en attente de confirmation.
 3. Annoncer le plan d'implementation : reutilisations, variantes, nouveaux composants, page, impacts et validations.
-4. Implementer dans cet ordre :
+4. Marquer les cibles JSON `in-progress`, puis implementer dans cet ordre :
    - reutilisations et configuration ;
    - variantes confirmees ;
    - nouveaux composants justifies ;
@@ -88,7 +88,7 @@ Lorsqu'une reponse utilisateur confirme ou corrige l'analyse :
 13. Charger `rgaa`, controler les themes applicables et suivre `references/verification-matrix.md`.
 14. Poser les questions RGAA contextuelles restantes. Si une reponse conditionne le HTML, le comportement clavier, le contenu accessible ou l'ordre de lecture, garder le build en `blocked` ou `review`.
 15. Boucler raisonnablement : implementer, rendre, comparer, corriger, retester. Ne pas livrer apres une seule capture si un ecart evident subsiste.
-16. Mettre l'artefact a jour avec les preuves et le statut final.
+16. Passer les cibles JSON à `done` seulement si leurs vérifications réussissent, puis mettre l'artefact a jour avec les preuves et le statut final.
 17. Livrer le HTML genere, le bilan des composants, les impacts, les preuves visuelles, les validations et les questions manuelles restantes.
 
 ## Protocole De Question
