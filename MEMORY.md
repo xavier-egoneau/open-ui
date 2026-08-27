@@ -41,6 +41,7 @@ Open UI explore un framework agentique de design/dev UI : l'agent peut concevoir
 - Critique loop : les retours utilisateur doivent devenir des règles utiles, pas un journal infini.
 - Visual ambition with control : le mode sketch doit chercher du caractère sans perdre lisibilité, accessibilité et faisabilité.
 - Frontière source/rendu : `dev/` contient les sources du projet, y compris `dev/sketches/` pour les esquisses ; `public/` contient le rendu généré, ignoré pendant le développement courant mais conservable pour la production. `public/` n'est jamais la source de vérité.
+- Frontière des skills : `skill-src/` est l'unique source éditable ; les dossiers propres à Codex, Copilot, Claude, OpenCode et Pi sont générés uniquement pour la cible demandée et ne doivent pas diverger manuellement.
 - Design d'attention pour outils critiques : pour une app médicale ou experte de suivi quotidien, guider le regard vers qui regarder maintenant, pourquoi c'est important, quelle décision prendre et ce qui peut attendre, plutôt qu'exposer tous les modules avec le même poids.
 
 ### Langage visuel
@@ -90,7 +91,6 @@ Open UI explore un framework agentique de design/dev UI : l'agent peut concevoir
 - Quel statut utiliser dans les données : `draft`, `sketch`, `canonical` ?
 - Comment promouvoir une esquisse sans laisser de dette ou de composants morts ?
 - Faut-il inclure les esquisses dans les commandes de listing ?
-- Comment compiler un texte de skill commun vers les formats propres à Codex, Claude, Copilot et aux harnais personnalisés sans faire diverger son contenu normatif ?
 
 ## Entrées
 

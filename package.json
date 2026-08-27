@@ -16,6 +16,10 @@
     "test:empty": "node scripts/test-empty-workspace.js",
     "test:watch": "vitest",
     "impact": "node scripts/impact.js",
+    "skills:import": "node scripts/skill-harness.js import --from codex",
+    "skills:build": "node scripts/skill-harness.js build",
+    "skills:check": "node scripts/skill-harness.js check",
+    "skills:list-targets": "node scripts/skill-harness.js list",
     "clean": "node scripts/clean-build.js"
   },
   "devDependencies": {

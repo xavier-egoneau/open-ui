@@ -1,45 +1,6 @@
 ---
 name: rgaa
 description: Skill RGAA generaliste base sur la methode officielle RGAA 4.1.2. A utiliser pour prevenir, relire ou corriger l'accessibilite de composants UI, bibliotheques de composants, pages HTML/Twig, formulaires, navigation, scripts/interactions, images, tableaux et contenus. Ne remplace pas un audit legal complet.
-commands: rgaa-check-component, rgaa-check-page, rgaa-review, rgaa-map-criteria
-amk:
-  command_descriptions:
-    /rgaa-check-component: Vérifier un composant UI avec une lecture RGAA généraliste
-    /rgaa-check-page: Vérifier une page ou un template avec une lecture RGAA généraliste
-    /rgaa-review: Relire un changement avec un angle RGAA
-    /rgaa-map-criteria: Relier une cible UI aux thématiques RGAA pertinentes
-  command_prompts:
-    /rgaa-check-component: |
-      Vérifie un composant selon le RGAA sans promettre d'audit complet.
-
-      1. Lis le template, les styles, le JS éventuel, la doc et les usages du composant.
-      2. Charge les références RGAA utiles selon la famille du composant.
-      3. Contrôle sémantique, nom accessible, clavier, focus, états, contrastes évidents, erreurs et documentation.
-      4. Si possible, teste le rendu au navigateur et les interactions clavier.
-      5. Réponds avec `Bloquant`, `A corriger`, `A vérifier manuellement`, `OK / Non applicable`, en citant fichiers/lignes.
-    /rgaa-check-page: |
-      Vérifie une page selon le RGAA sans promettre d'audit complet.
-
-      1. Lis la page/template, les composants inclus, styles et scripts pertinents.
-      2. Charge `socle.md`, `navigation-structure.md`, puis les références des zones présentes.
-      3. Contrôle langue, titre, landmarks, titres, liens, navigation, formulaires, images, tableaux, consultation responsive et clavier.
-      4. Ouvre le rendu si possible et teste les parcours visibles.
-      5. Classe les constats par sévérité et signale les tests manuels restants.
-    /rgaa-review: |
-      Relis une modification existante avec l'angle RGAA.
-
-      1. Inspecte le diff et la cible utilisateur.
-      2. Identifie les thèmes RGAA concernés.
-      3. Vérifie si le changement dégrade ou améliore sémantique, clavier, focus, labels, erreurs, alternatives, navigation ou consultation.
-      4. Priorise les régressions observables et les manques de tests.
-      5. Réponds d'abord avec les risques/problèmes, puis les corrections proposées et validations manquantes.
-    /rgaa-map-criteria: |
-      Cartographie les thématiques RGAA d'une cible.
-
-      1. Identifie la nature de la cible : image, lien, script, formulaire, navigation, tableau, page, contenu.
-      2. Liste les thématiques RGAA pertinentes parmi les 13.
-      3. Indique les références du skill à charger.
-      4. Propose les contrôles concrets à faire et ce qui restera manuel.
 ---
 
 # Skill RGAA

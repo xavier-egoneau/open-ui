@@ -98,6 +98,7 @@ open-ui/
 |- dev/          sources locales du projet utilisateur
 |- showcase/     application système versionnée
 |- scripts/      validation, cartographie, impact et génération
+|- skill-src/    source canonique portable des skills et commandes agents
 |- docs/         contrats et décisions d’architecture
 `- public/       rendu généré par Vite
 ```
@@ -116,6 +117,8 @@ Le Showcase ne réécrit jamais les JSON : les modifications faites dans son for
 | `npm run lint:scss` | Vérifie les sources SCSS présentes |
 | `npm run list` | Liste les composants et les pages détectés |
 | `npm run impact -- <composant>` | Cartographie les usages d’un composant |
+| `npm run skills:build -- --target codex` | Génère uniquement les skills du harnais demandé |
+| `npm run skills:check -- --target codex` | Vérifie qu'une sortie de skills correspond à `skill-src/` |
 | `npm run clean` | Supprime la sortie générée `public/` |
 
 `npm run build` remplace le contenu existant de `public/`. Ce dossier est ignoré par Git pendant le développement actuel ; lorsqu’il deviendra un livrable de production versionné, il faudra retirer sa règle du `.gitignore`.

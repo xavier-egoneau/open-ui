@@ -25,6 +25,17 @@ Pour toute demande utilisateur, l'agent suit cette sequence :
 - Ne pas casser le design system pour satisfaire un cas local.
 - Ne pas confondre maquette/esquisse et composant canonique.
 
+## Entree Figma finalisee
+
+Une maquette Figma finalisee suit le skill `figma-to-open-ui`, distinct du tunnel de sketch exploratoire :
+
+1. `/open-ui-analyze-figma <url>` lit Figma, confronte la bibliotheque et produit `.openui/analyses/<slug>.json` sans modifier le design system.
+2. L'utilisateur confirme ou corrige les reutilisations, variantes, nouveaux composants, impacts et questions structurantes.
+3. `/open-ui-implement-figma <analyse>` exige le statut `approved`, implemente composants puis page, compare le rendu a Figma et verifie responsive, interactions, HTML, Axe et risques RGAA.
+4. Une question RGAA contextuelle qui conditionne le HTML, le focus, l'ordre de lecture ou le contenu accessible empeche le statut `done` tant qu'elle n'est pas arbitree.
+
+Le detail operatoire et le format d'analyse vivent dans `skill-src/skills/figma-to-open-ui/`. La copie `.agents/skills/figma-to-open-ui/` est générée pour Codex. `GUIDELINES_AI.md` reste la source des invariants techniques du design system.
+
 ## Creation
 
 Creer est legitime dans deux cas :
@@ -38,7 +49,7 @@ Un composant canonique doit avoir JSON, Twig, Markdown et SCSS si necessaire. Un
 
 - `npm run validate`
 - `npm run list` si la cartographie doit etre relue
-- `npm run impact <component>` si un composant est touche
+- `npm run impact -- <component>` si un composant est touche
 - `npm run lint:scss` si SCSS touche
 - `npm run build` si rendu/imports/pages touches
 
@@ -46,6 +57,5 @@ Un composant canonique doit avoir JSON, Twig, Markdown et SCSS si necessaire. Un
 
 - Comment l'agent doit-il arbitrer entre modification locale et nouvelle variante ?
 - Quel format de bilan standard adopter apres chaque modification ?
-- Comment integrer une critique visuelle ou capture navigateur dans le workflow ?
 - Quand bb9 doit-il entrer dans la boucle agentique Open UI ?
 - Comment faire travailler plusieurs agents sans perdre l'integrite du design system ?
